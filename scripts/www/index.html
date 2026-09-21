@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>商会会员撮合平台</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #eef1f6; color: #232b38; font-size: 14px; }
+#app { max-width: 480px; margin: 0 auto; min-height: 100vh; background: #f5f6fa; position: relative; display: flex; flex-direction: column; }
+.page { flex: 1; padding: 14px 14px 150px; overflow-y: auto; }
+.page-no-tab { padding-bottom: 40px; }
+.topbar { position: sticky; top: 0; z-index: 40; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid #f0f2f6; }
+.topbar .tt { font-size: 18px; font-weight: 800; }
+.topbar .tb-btn { width: 38px; height: 38px; border-radius: 50%; background: #eef2f7; color: #46556a; font-size: 22px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; }
+.topbar .tb-btn.primary { background: #2b5cff; color: #fff; font-size: 20px; }
+.section-title { font-size: 15px; font-weight: 800; margin: 16px 2px 10px; }
+.section-title:first-child { margin-top: 2px; }
+.card { background: #fff; border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 10px rgba(20,40,90,.05); }
+.empty { text-align: center; padding: 50px 0 36px; }
+.empty .t { font-size: 14px; font-weight: 700; color: #5a6678; margin-top: 8px; }
+.empty .s { font-size: 12px; color: #9aa5b4; margin-top: 6px; }
+.field { margin-bottom: 14px; }
+.label { font-size: 13px; font-weight: 600; color: #46556a; margin-bottom: 6px; }
+.input { width: 100%; height: 42px; border: 1px solid #e3e8f0; border-radius: 10px; background: #fff; padding: 0 12px; font-size: 14px; color: #232b38; outline: none; }
+textarea.input { height: auto; min-height: 70px; padding: 10px 12px; resize: none; }
+.input:focus { border-color: #2b5cff; }
+.picker-wrap { display: flex; align-items: center; justify-content: space-between; width: 100%; height: 42px; border: 1px solid #e3e8f0; border-radius: 10px; background: #fff; padding: 0 12px; font-size: 14px; cursor: pointer; }
+.hint { font-size: 11px; color: #9aa5b4; margin: -4px 0 12px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; height: 42px; border-radius: 10px; font-size: 15px; font-weight: 600; border: none; padding: 0 18px; cursor: pointer; }
+.btn-block { width: 100%; }
+.btn-primary { background: #2b5cff; color: #fff; }
+.btn-primary-soft { background: #ffe9f0; color: #d6336c; }
+.btn-ghost { background: #eef2f7; color: #2b5cff; }
+.btn-danger { background: #fdeeee; color: #e04a4a; }
+.btn-sm { height: 32px; font-size: 13px; border-radius: 8px; padding: 0 14px; }
+.badge { display: inline-block; font-size: 11px; padding: 2px 9px; border-radius: 10px; margin-right: 6px; vertical-align: middle; }
+.b-new { background: #e6f4ff; color: #2b5cff; }
+.b-contact { background: #fff3e0; color: #e08a00; }
+.b-confirmed { background: #e6f7ee; color: #0d8a5c; }
+.b-done { background: #eef1f5; color: #7d8794; }
+.b-supply { background: #e6f4ff; color: #2b5cff; }
+.b-demand { background: #ffe9f0; color: #d6336c; }
+.b-pending { background: #fff3e0; color: #e08a00; }
+.seg { display: flex; background: #eef2f7; border-radius: 10px; padding: 3px; }
+.seg-item { flex: 1; text-align: center; height: 36px; line-height: 36px; border-radius: 8px; font-size: 14px; color: #5a6678; cursor: pointer; }
+.seg-item.on { background: #fff; color: #2b5cff; font-weight: 700; box-shadow: 0 1px 6px rgba(20,40,90,.08); }
+.login-page { padding: 30px 20px 50px; min-height: 100vh; background: linear-gradient(180deg,#eef4ff 0%,#f5f6fa 40%); }
+.login-hero { text-align: center; padding: 22px 0 28px; }
+.login-logo { width: 62px; height: 62px; border-radius: 18px; background: linear-gradient(135deg,#4d7dff,#2b5cff); color: #fff; font-size: 30px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; box-shadow: 0 10px 24px rgba(43,92,255,.3); }
+.login-title { font-size: 20px; font-weight: 800; }
+.login-sub { font-size: 12px; color: #8a94a6; margin-top: 6px; }
+.login-seg { margin-bottom: 16px; }
+.login-form { background: #fff; border-radius: 14px; padding: 18px 16px; box-shadow: 0 6px 20px rgba(20,40,90,.06); }
+.login-tip { background: #fff8ec; border: 1px solid #f5d9a8; border-radius: 8px; padding: 9px 12px; font-size: 12px; color: #a05b00; margin-bottom: 14px; line-height: 1.6; }
+.login-btn { margin-top: 6px; height: 46px; }
+.login-link { text-align: center; color: #2b5cff; font-size: 13px; margin-top: 14px; cursor: pointer; }
+.pwd-wrap { position: relative; }
+.pwd-eye { position: absolute; right: 6px; top: 7px; width: 34px; height: 28px; display: flex; align-items: center; justify-content: center; color: #9aa5b4; font-size: 12px; cursor: pointer; }
+/* tabbar */
+.tabbar { position: fixed; left: 50%; transform: translateX(-50%); bottom: 0; width: 100%; max-width: 480px; z-index: 60; display: flex; justify-content: space-around; align-items: center; background: #fff; border-top: 1px solid #f0f2f6; padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); box-shadow: 0 -3px 16px rgba(20,40,90,.06); }
+.tab { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.tab-pill { min-width: 66px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 18px; background: #ffd0dd; border: 1px solid #ffb9cd; color: #a33c5c; font-size: 13px; font-weight: 600; transition: all .15s; }
+.tab.on .tab-pill { background: #ff8fab; border-color: #ff8fab; color: #fff; font-weight: 800; }
+.tab-badge { position: absolute; top: -5px; right: 12px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 10px; background: #e04a4a; color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+/* 会员管理 */
+.apply-entry { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px dashed #d3ddf5; border-radius: 10px; padding: 11px 13px; margin-bottom: 12px; font-size: 14px; font-weight: 700; color: #2b5cff; cursor: pointer; }
+.apply-badge { min-width: 20px; height: 20px; padding: 0 5px; border-radius: 11px; background: #e04a4a; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 6px; }
+.filter-pill { width: 23.5%; height: 36px; border-radius: 18px; border: 1.5px solid; background: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.filter-pill select { border: none; background: transparent; color: inherit; font-size: 13px; font-weight: 600; text-align: center; text-align-last: center; outline: none; width: 100%; height: 100%; cursor: pointer; padding: 0 4px; }
+.member-count { font-size: 12px; color: #8a94a6; margin: 0 2px 10px; }
+.member-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.member-cell { width: calc((100% - 40px) / 6); height: 46px; border-radius: 23px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; cursor: pointer; box-sizing: border-box; }
+.m-male { background: #cfe0ff; color: #2b5cff; }
+.m-female { background: #ffd0dd; color: #a33c5c; }
+.detail-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.avatar { border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+.avatar-lg { width: 62px; height: 62px; font-size: 24px; }
+.avatar-sm { width: 32px; height: 32px; font-size: 13px; }
+.detail-name { font-size: 18px; font-weight: 800; }
+.detail-tags { display: flex; gap: 6px; margin-top: 6px; }
+.d-tag { font-size: 11px; background: #eef2f7; color: #5a6678; border-radius: 6px; padding: 3px 8px; }
+.d-tag.ok { background: #e6f7ee; color: #0d8a5c; }
+.detail-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f2f6; font-size: 14px; }
+.detail-row .k { width: 88px; color: #8a94a6; flex-shrink: 0; }
+.detail-row .v { flex: 1; color: #232b38; font-weight: 500; }
+.phone-row { display: flex; align-items: center; justify-content: space-between; }
+.call-btn { width: 38px; height: 38px; border-radius: 50%; background: #23c16b; color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-left: 8px; cursor: pointer; border: none; box-shadow: 0 4px 10px rgba(35,193,107,.35); }
+/* 供需 */
+.item-card { cursor: pointer; position: relative; }
+.item-top { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.item-time { margin-left: auto; font-size: 11px; color: #9aa5b4; }
+.item-title { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+.item-desc { font-size: 12px; color: #7d8794; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.item-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+.tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.tag { font-size: 11px; background: #f0f4fb; color: #2b5cff; border-radius: 5px; padding: 2px 7px; }
+.item-anon { font-size: 11px; color: #9aa5b4; }
+.mine-tag { position: absolute; right: 0; top: 0; font-size: 10px; color: #fff; background: #e08a00; border-radius: 0 10px 0 10px; padding: 3px 8px; }
+.cat-pill { display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 16px; background: #fff; border: 1px solid #e3e8f0; color: #46556a; font-size: 13px; margin-bottom: 12px; cursor: pointer; }
+.fab { position: fixed; left: 50%; transform: translateX(-50%); bottom: 86px; z-index: 50; width: 108px; height: 42px; border-radius: 22px; box-shadow: 0 8px 20px rgba(43,92,255,.35); }
+.detail-line { font-size: 13px; color: #7d8794; margin-top: 10px; }
+/* 撮合 */
+.m-top { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.m-score { margin-left: auto; font-size: 12px; font-weight: 700; color: #e08a00; }
+.m-summary { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+.m-meta { font-size: 12px; color: #8a94a6; }
+.m-contract-tag { display: inline-block; margin-top: 8px; font-size: 11px; color: #0d8a5c; background: #e6f7ee; border-radius: 6px; padding: 3px 9px; }
+.contract-box { margin-top: 12px; background: #f7f9fc; border-radius: 10px; padding: 12px; }
+.contract-title { font-size: 14px; font-weight: 800; margin-bottom: 8px; }
+.contract-content { font-size: 12px; color: #46556a; line-height: 1.8; white-space: pre-wrap; word-break: break-all; }
+/* 首页 */
+.banner { width: 100%; height: 350px; border-radius: 12px; overflow: hidden; margin-bottom: 14px; position: relative; }
+.banner-item { position: absolute; inset: 0; border-radius: 12px; background: linear-gradient(135deg,#4d7dff,#2b5cff); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; padding: 20px; text-align: center; transition: opacity .4s; opacity: 0; pointer-events: none; }
+.banner-item.on { opacity: 1; }
+.banner-title { font-size: 20px; font-weight: 800; }
+.banner-sub { font-size: 13px; opacity: .9; margin-top: 8px; }
+.banner-dots { position: absolute; bottom: 10px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px; }
+.banner-dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.45); }
+.banner-dots i.on { background: #fff; }
+.intro-text { font-size: 13px; color: #5a6678; line-height: 1.8; }
+.act-card { cursor: pointer; }
+.act-title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.act-title { font-size: 15px; font-weight: 800; flex: 1; }
+.act-line { font-size: 12px; color: #7d8794; margin: 4px 0; }
+.more-grid { display: flex; gap: 10px; }
+.more-card { flex: 1; background: #fff; border-radius: 10px; padding: 14px 10px; box-shadow: 0 2px 10px rgba(20,40,90,.05); text-align: center; cursor: pointer; }
+.more-name { font-size: 14px; font-weight: 800; color: #2b5cff; }
+.more-sub { font-size: 11px; color: #9aa5b4; margin-top: 6px; }
+/* 活动 */
+.roster-grid { display: flex; flex-wrap: wrap; gap: 7px; }
+.roster-cell { width: calc((100% - 49px) / 8); height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; box-sizing: border-box; overflow: hidden; }
+.act-big-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+.act-state { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.act-count { font-size: 12px; color: #8a94a6; margin-left: auto; }
+.act-row { font-size: 13px; color: #46556a; margin: 5px 0; }
+.act-desc { font-size: 12px; color: #5a6678; line-height: 1.7; background: #f7f9fc; border-radius: 8px; padding: 10px 12px; margin-top: 10px; }
+.act-actions { margin-top: 16px; }
+.cancelled-tip { text-align: center; font-size: 13px; color: #e08a00; padding: 16px 0; }
+/* 看板 */
+.chart-box { height: 220px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; justify-content: center; margin-top: 10px; }
+.lg { display: inline-flex; align-items: center; font-size: 11px; color: #5a6678; gap: 4px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+/* 统计 */
+.stat-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.stat-cell { width: calc((100% - 16px) / 3); background: #fff; border-radius: 10px; padding: 14px 0; text-align: center; box-shadow: 0 2px 10px rgba(20,40,90,.05); }
+.stat-cell .n { font-size: 22px; font-weight: 800; color: #2b5cff; }
+.stat-cell .t { font-size: 11px; color: #8a94a6; margin-top: 4px; }
+/* 弹层 */
+.overlay-mask { position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 100; display: none; align-items: flex-end; justify-content: center; }
+.overlay-mask.show { display: flex; }
+.overlay-body { width: 100%; max-width: 480px; max-height: 82vh; background: #fff; border-radius: 16px 16px 0 0; padding: 14px 16px; display: flex; flex-direction: column; }
+.overlay-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.overlay-title { font-size: 16px; font-weight: 800; }
+.overlay-close { width: 26px; height: 26px; border-radius: 50%; background: #f0f3f8; color: #5a6678; font-size: 17px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; }
+.overlay-content { overflow-y: auto; max-height: 62vh; }
+.overlay-foot { display: flex; gap: 10px; margin-top: 12px; }
+.overlay-foot .btn { flex: 1; }
+/* 工作台 */
+.wb-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.wb-name { font-size: 17px; font-weight: 800; }
+.wb-sub { font-size: 12px; color: #8a94a6; margin-top: 4px; }
+.wb-row { display: flex; padding: 8px 0; border-bottom: 1px solid #f0f2f6; font-size: 13px; }
+.wb-row .k { width: 86px; color: #8a94a6; flex-shrink: 0; }
+.wb-row .v { flex: 1; color: #232b38; font-weight: 500; }
+/* 管理员 */
+.b-preview { height: 86px; border-radius: 10px; background: linear-gradient(135deg,#4d7dff,#2b5cff); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; margin-bottom: 10px; }
+.b-preview .bt { font-size: 15px; font-weight: 800; }
+.b-preview .bs { font-size: 11px; opacity: .9; margin-top: 4px; }
+.b-ops { display: flex; gap: 8px; }
+.b-ops .btn { flex: 1; }
+.rs-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f2f6; }
+.rs-name { flex: 1; font-size: 14px; font-weight: 600; }
+.rs-phone { font-size: 12px; color: #46556a; }
+.op-row { display: flex; gap: 8px; margin-top: 10px; }
+.op-row .btn { flex: 1; }
+@media (max-width: 480px) { .banner { height: 350px; } }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ================= 数据层 ================= */
+var AUTH_CODE = 'PG9D8NCA5J3E8TDW6C9988D6UFM863DE';
+var LS = 'chamber_html_v1', LS_SESSION = 'chamber_session_v1';
+function daysAgo(d, h){ var t=new Date(); t.setDate(t.getDate()-d); t.setHours(h||10,0,0,0); return t.toISOString(); }
+function uid(p){ return (p||'x')+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function anonName(m){ return m ? m.name.charAt(0)+(m.gender==='女士'?'女士':'先生') : '某会员'; }
+function fmtTime(iso){ if(!iso)return ''; var d=new Date(iso); function p(n){return n<10?'0'+n:''+n;} return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
+var TITLES=['名誉会长','会长','副会长','秘书长','副秘书长','理事','会员','管理员'];
+var CATEGORIES=['餐饮食品','农产品','电子产品','家居建材','服装纺织','法律服务','金融投资','教育培训','建筑工程','交通运输','医疗器械','物流运输','文化传媒','机械设备','能源环保','旅游服务'];
+var FIELD_OPTIONS=CATEGORIES.concat(['其他']);
+var PRES_TABS=[['p_members','会员管理'],['p_items','供需信息'],['p_matches','撮合记录'],['p_requests','联系请求']];
+var MEM_TABS=[['m_home','首页'],['m_square','供需'],['m_mypub','管理'],['m_mymatch','撮合']];
+var MG_TABS=[['mg_content','首页管理'],['mg_activities','活动管理'],['mg_password','修改密码']];
+
+function newDB(){
+  var members=[
+    {id:'m1',account:'zhangwei',password:'123456',name:'张伟',title:'副会长',gender:'先生',age:42,phone:'13800000001',company:'伟业餐饮管理有限公司',field:'餐饮食品',pwdHint:'我的家在湖南长沙',pwdAnswer:'我的家在湖南长沙',status:'active',createdAt:daysAgo(30,9)},
+    {id:'m2',account:'limei',password:'123456',name:'李梅',title:'理事',gender:'女士',age:36,phone:'13800000002',company:'梅香食品贸易公司',field:'餐饮食品',pwdHint:'我爱吃家乡的辣椒',pwdAnswer:'我爱吃家乡的辣椒',status:'active',createdAt:daysAgo(28,11)},
+    {id:'m3',account:'wangfang',password:'123456',name:'王芳',title:'会员',gender:'女士',age:33,phone:'13800000003',company:'芳华电子科技公司',field:'电子产品',pwdHint:'我的孩子在上小学',pwdAnswer:'我的孩子在上小学',status:'active',createdAt:daysAgo(26,15)},
+    {id:'m4',account:'liqiang',password:'123456',name:'李强',title:'理事',gender:'先生',age:45,phone:'13800000004',company:'强盛建筑工程有限公司',field:'建筑工程',pwdHint:'我年轻时当过兵',pwdAnswer:'我年轻时当过兵',status:'active',createdAt:daysAgo(24,10)},
+    {id:'m5',account:'zhaomin',password:'123456',name:'赵敏',title:'秘书长',gender:'女士',age:39,phone:'13800000005',company:'敏达企业管理咨询公司',field:'金融投资',pwdHint:'我老家在四川成都',pwdAnswer:'我老家在四川成都',status:'active',createdAt:daysAgo(22,14)},
+    {id:'m6',account:'chenlong',password:'123456',name:'陈龙',title:'会员',gender:'先生',age:51,phone:'13800000006',company:'龙腾机械设备制造厂',field:'机械设备',pwdHint:'我喜欢收藏老物件',pwdAnswer:'我喜欢收藏老物件',status:'active',createdAt:daysAgo(20,9)},
+    {id:'m7',account:'liuyan',password:'123456',name:'刘燕',title:'会员',gender:'女士',age:29,phone:'13800000007',company:'燕康医疗器械有限公司',field:'医疗器械',pwdHint:'我毕业于医学院',pwdAnswer:'我毕业于医学院',status:'active',createdAt:daysAgo(18,16)},
+    {id:'m8',account:'sunlei',password:'123456',name:'孙磊',title:'副会长',gender:'先生',age:48,phone:'13800000008',company:'磊创照明电器有限公司',field:'电子产品',pwdHint:'我公司做照明十年了',pwdAnswer:'我公司做照明十年了',status:'active',createdAt:daysAgo(15,12)}
+  ];
+  var items=[
+    {id:'i1',memberId:'m1',type:'demand',category:'餐饮食品',title:'食堂大宗食材采购',desc:'旗下 5 家连锁餐厅食堂月需蔬菜、肉类、粮油，寻找稳定供应商长期合作。',tags:['蔬菜','肉类','粮油'],status:'on',createdAt:daysAgo(6,9)},
+    {id:'i2',memberId:'m2',type:'supply',category:'餐饮食品',title:'有机蔬菜与特色农产品供应',desc:'自有蔬菜基地 300 亩，提供有机蔬菜、时令水果及腊味特产，可配送至全市。',tags:['蔬菜','配送','特产'],status:'on',createdAt:daysAgo(6,10)},
+    {id:'i3',memberId:'m2',type:'supply',category:'餐饮食品',title:'粮油干货批发供应',desc:'经销东北大米、非转基因食用油及干货调料，量大从优，支持食堂供货。',tags:['粮油','干货','批发'],status:'on',createdAt:daysAgo(6,11)},
+    {id:'i4',memberId:'m3',type:'demand',category:'电子产品',title:'需要手机充电器代工',desc:'自有品牌需采购充电器成品，月需求 5 万只，寻找有资质工厂合作。',tags:['充电器','代工','采购'],status:'on',createdAt:daysAgo(4,15)},
+    {id:'i5',memberId:'m3',type:'supply',category:'电子产品',title:'消费电子配件供应',desc:'主营数据线、充电器、耳机等消费电子配件，支持 OEM，欢迎渠道合作。',tags:['数据线','耳机','OEM'],status:'on',createdAt:daysAgo(4,16)},
+    {id:'i6',memberId:'m4',type:'supply',category:'建筑工程',title:'建筑工程项目承接',desc:'一级资质施工企业，承接房建、市政、装修工程，欢迎项目合作与分包。',tags:['房建','市政','装修'],status:'on',createdAt:daysAgo(5,9)},
+    {id:'i7',memberId:'m4',type:'demand',category:'建筑工程',title:'采购建筑材料',desc:'在施项目需采购钢材、水泥、瓷砖等建材，量大，诚寻源头供应商。',tags:['钢材','水泥','瓷砖'],status:'on',createdAt:daysAgo(4,10)},
+    {id:'i8',memberId:'m5',type:'supply',category:'金融投资',title:'企业融资与财税咨询服务',desc:'提供银行贷款对接、财税合规、企业投资顾问服务，服务中小企业多年。',tags:['融资','财税','顾问'],status:'on',createdAt:daysAgo(3,14)},
+    {id:'i9',memberId:'m5',type:'demand',category:'金融投资',title:'寻找股权投资标的',desc:'私募基金寻找成长期企业股权投资机会，偏好科技与消费领域。',tags:['股权','投资','科技'],status:'on',createdAt:daysAgo(3,15)},
+    {id:'i10',memberId:'m6',type:'supply',category:'机械设备',title:'数控加工设备供应',desc:'生产数控机床与自动化设备，提供设备选型、安装调试一站式服务。',tags:['数控','机床','自动化'],status:'on',createdAt:daysAgo(3,10)},
+    {id:'i11',memberId:'m6',type:'demand',category:'机械设备',title:'需要精密零部件加工',desc:'订单增多需外协精密零部件加工，要求 ISO 认证工厂，长期合作。',tags:['精密','加工','外协'],status:'on',createdAt:daysAgo(2,11)},
+    {id:'i12',memberId:'m7',type:'supply',category:'医疗器械',title:'医疗器械代理与供应',desc:'代理进口检验设备、耗材，提供医院科室整体解决方案。',tags:['检验','耗材','医院'],status:'on',createdAt:daysAgo(3,16)},
+    {id:'i13',memberId:'m7',type:'demand',category:'医疗器械',title:'采购医用耗材',desc:'诊所扩张需采购一次性医用耗材，寻求质量可靠的源头厂家。',tags:['耗材','一次性','采购'],status:'on',createdAt:daysAgo(1,9)},
+    {id:'i14',memberId:'m7',type:'demand',category:'物流运输',title:'需要医疗器械仓储配送',desc:'体检设备与耗材需要合规仓储和配送，寻找具备医疗物资运输经验的合作方。',tags:['仓储','配送','冷链'],status:'on',createdAt:daysAgo(0,9)},
+    {id:'i15',memberId:'m8',type:'supply',category:'电子产品',title:'智能照明与电子元器件供应',desc:'专业生产智能照明、LED 灯具及电子元器件，支持 OEM/ODM，提供智能照明方案。',tags:['智能','照明','元器件'],status:'on',createdAt:daysAgo(3,16)},
+    {id:'i16',memberId:'m8',type:'demand',category:'法律服务',title:'寻求常年法律顾问合作',desc:'企业规模扩大，需要常年法律顾问提供合同审查与合规咨询，希望长期稳定合作。',tags:['合同审查','顾问','合规'],status:'on',createdAt:daysAgo(0,14)}
+  ];
+  var db={version:1,init:false,president:{account:'cwcfsf',password:'',name:'商会会长',role:'president',gender:'先生'},members:members,items:items,matches:[],requests:[],seq:0};
+  db.home={
+    banners:[
+      {id:'b1',img:'',title:'欢迎加入商会大家庭',sub:'资源共享 · 商机撮合'},
+      {id:'b2',img:'',title:'商会企业走访活动火热报名中',sub:'走进标杆企业，交流合作'},
+      {id:'b3',img:'',title:'供需对接 · 智能撮合',sub:'发布需求即可自动匹配'}
+    ],
+    intro:'本商会是由各行业企业家自愿组成的非营利性社会组织，致力于搭建资源共享、信息互通、合作共赢的平台。商会定期组织企业走访、行业沙龙、供需对接等活动，帮助会员拓展人脉、撮合商机、共同发展。',
+    activities:[
+      {id:'a1',title:'会员企业走访交流活动',desc:'走进深圳标杆制造企业，实地参观生产线，交流供应链与智能制造经验，现场对接合作需求。',time:'2026-09-20 14:00',location:'深圳市南山区科技园',quota:30,joined:['m1','m2'],cancelled:[],status:'open',createdAt:daysAgo(3,10)},
+      {id:'a2',title:'行业沙龙：供应链金融分享会',desc:'邀请银行与金融机构专家，分享中小企业融资与供应链金融实操经验，现场答疑对接。',time:'2026-09-26 15:00',location:'商会会议室（福田区）',quota:20,joined:['m3'],cancelled:[],status:'open',createdAt:daysAgo(2,14)}
+    ]
+  };
+  db.matches=seedMatches(db);
+  var dmM=db.matches.find(function(x){return x.id==='mseed2';});
+  if(dmM){
+    var mm3=members.find(function(x){return x.id==='m3';});
+    var mm4=members.find(function(x){return x.id==='m4';});
+    dmM.status='confirmed'; dmM.confirmA=true; dmM.confirmB=true;
+    dmM.contract={id:'c_seed1',content:makeContractText(dmM,mm3,mm4,items.find(function(i){return i.id===dmM.demandItemId;}),items.find(function(i){return i.id===dmM.supplyItemId;})),version:1,updatedAt:new Date().toISOString()};
+  }
+  db.requests=[
+    {id:'r1',fromMemberId:'m1',toMemberId:'m2',itemId:'i3',message:'您好，我们食堂每月用量较大，想了解有机蔬菜的批发价格和起订量。',status:'pending',createdAt:daysAgo(2,15)},
+    {id:'r2',fromMemberId:'m6',toMemberId:'m8',itemId:'i15',message:'连锁门店需要智能照明方案，方便发一份产品目录吗？',status:'pending',createdAt:daysAgo(1,10)},
+    {id:'r3',fromMemberId:'m7',toMemberId:'m4',itemId:'i7',message:'想咨询医疗器械温控仓储与配送的合作细节。',status:'done',createdAt:daysAgo(0,11)}
+  ];
+  return db;
+}
+function seedMatches(db){
+  var out=[],n=0;
+  function push(demId,supId,day,h,st){
+    var dem=db.items.find(function(x){return x.id===demId;}),sup=db.items.find(function(x){return x.id===supId;});
+    var shared=dem.tags.filter(function(t){return sup.tags.indexOf(t)>-1;});
+    var score=Math.min(100,60+10*shared.length);
+    out.push({id:'mseed'+(++n),demandItemId:demId,supplyItemId:supId,demandMemberId:dem.memberId,supplyMemberId:sup.memberId,category:dem.category,score:score,status:st||'new',createdAt:daysAgo(day,h),summary:dem.title+' ⇄ '+sup.title});
+  }
+  push('i2','i3',6,10,'done'); push('i4','i7',4,11,'contacted'); push('i10','i5',4,15,'contacted');
+  push('i12','i15',3,14,'new'); push('i16','i9',1,10,'new'); push('i14','i7',0,9,'new'); push('i8','i15',0,15,'new');
+  return out;
+}
+function db(){ try{ var raw=localStorage.getItem(LS); if(raw){ var d=JSON.parse(raw); if(d&&d.president&&d.members){ if(!d.home)d.home=newDB().home; return d; } } }catch(e){} var nd=newDB(); try{ localStorage.setItem(LS,JSON.stringify(nd)); }catch(e){} return nd; }
+function save(d){ try{ localStorage.setItem(LS,JSON.stringify(d||db())); }catch(e){} }
+function _inject(d){ try{ localStorage.setItem(LS,JSON.stringify(d)); }catch(e){} }
+function setSession(s){ try{ if(s) localStorage.setItem(LS_SESSION,JSON.stringify(s)); else localStorage.removeItem(LS_SESSION); }catch(e){} }
+function getSession(){ try{ return JSON.parse(localStorage.getItem(LS_SESSION))||null; }catch(e){ return null; } }
+function byId(id){ return db().members.find(function(x){return x.id===id;}); }
+/* 自动撮合引擎 */
+function runMatching(){
+  var d=db();
+  var actives=d.members.filter(function(x){return x.status==='active';});
+  var isActive=function(id){return actives.some(function(x){return x.id===id;});};
+  var supplies=d.items.filter(function(x){return x.type==='supply'&&x.status==='on';});
+  var demands=d.items.filter(function(x){return x.type==='demand'&&x.status==='on';});
+  var created=0;
+  demands.forEach(function(dem){
+    if(!isActive(dem.memberId))return;
+    supplies.forEach(function(sup){
+      if(sup.memberId===dem.memberId)return;
+      if(!isActive(sup.memberId))return;
+      if(dem.category!==sup.category)return;
+      var shared=dem.tags.filter(function(t){return sup.tags.indexOf(t)>-1;});
+      if(!shared.length)return;
+      var dup=d.matches.some(function(x){return x.demandItemId===dem.id&&x.supplyItemId===sup.id;});
+      if(dup)return;
+      var score=Math.min(100,60+10*shared.length);
+      d.matches.push({id:uid('m'),demandItemId:dem.id,supplyItemId:sup.id,demandMemberId:dem.memberId,supplyMemberId:sup.memberId,category:dem.category,score:score,status:'new',createdAt:new Date().toISOString(),summary:dem.title+' ⇄ '+sup.title});
+      created++;
+    });
+  });
+  if(created)save(d);
+  return created;
+}
+/* 登录 / 注册 / 找回 */
+function doLogin(acct,pwd){
+  var d=db();
+  if(acct===d.president.account){
+    if(!d.init){
+      if(pwd!==AUTH_CODE)return{ok:false,msg:'会长首次登录请输入授权码'};
+      d.president.password='123456'; d.init=true; save(d); setSession({role:'president'});
+      return{ok:true,msg:'首次登录成功，初始密码 123456，请及时修改',role:'president'};
+    }
+    if(pwd!==d.president.password)return{ok:false,msg:'会长账号或密码错误'};
+    setSession({role:'president'});
+    return{ok:true,msg:'欢迎回来，会长',role:'president'};
+  }
+  var m=d.members.find(function(x){return x.account===acct;});
+  if(!m||m.password!==pwd)return{ok:false,msg:'账号或密码错误'};
+  if(m.status==='pending')return{ok:false,msg:'账号正在等待会长审核通过，暂不能登录'};
+  if(m.status!=='active')return{ok:false,msg:'该账号已被禁用，请联系商会管理员'};
+  if(m.title==='管理员'){ setSession({role:'manager',memberId:m.id}); return{ok:true,msg:'欢迎，管理员',role:'manager',memberId:m.id}; }
+  setSession({role:'member',memberId:m.id});
+  return{ok:true,msg:'欢迎，'+anonName(m),role:'member',memberId:m.id};
+}
+function doRegister(f){
+  var d=db();
+  if(!f.acct||!f.pwd||!f.pwd2||!f.hint||!f.ans||!f.name||!f.phone||!f.comp||!f.age)return{ok:false,msg:'注册信息未填写完整，请将全部项目填写完整后再提交'};
+  if(!/^[a-zA-Z0-9]{4,16}$/.test(f.acct))return{ok:false,msg:'账号需为 4-16 位字母或数字'};
+  if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,8}$/.test(f.pwd))return{ok:false,msg:'密码须为 6-8 位，且包含大写字母、小写字母和数字'};
+  if(f.pwd!==f.pwd2)return{ok:false,msg:'两次输入的密码不一致'};
+  if((f.hint.match(/[\u4e00-\u9fa5]/g)||[]).length<4)return{ok:false,msg:'密码提示须为中文，且不少于 4 个字'};
+  if(!/^\d{8,}$/.test(f.ans)&&!/^[\u4e00-\u9fa5]{8,}$/.test(f.ans))return{ok:false,msg:'密码答案须为不少于 8 个数字，或不少于 8 个汉字'};
+  if(!/^1\d{10}$/.test(f.phone))return{ok:false,msg:'手机号码必须为 11 位数字，少于或多于均无法注册'};
+  if(!/^\d{1,3}$/.test(f.age)||+f.age<18||+f.age>100)return{ok:false,msg:'请填写正确的年龄'};
+  if(!f.comp)return{ok:false,msg:'请填写所属公司'};
+  if(f.title==='会长'||f.title==='管理员'){
+    if(!f.auth)return{ok:false,msg:f.title==='会长'?'请联系软件服务者：张先生，联系电话：13632753594':'管理员注册需输入授权码'};
+    if(f.auth!==AUTH_CODE)return{ok:false,msg:f.title==='会长'?'授权码不正确，请联系软件服务者：张先生，联系电话：13632753594':'管理员授权码不正确，无法注册'};
+  }
+  if(f.acct.toLowerCase()===d.president.account.toLowerCase())return{ok:false,msg:'该账号已被使用，请更换其他登录账号名'};
+  if(d.members.some(function(x){return x.account.toLowerCase()===f.acct.toLowerCase();}))return{ok:false,msg:'该账号已被注册，请更换其他登录账号名'};
+  var nm={id:uid('m'),account:f.acct,password:f.pwd,name:f.name,title:f.title,gender:f.gender,age:+f.age,phone:f.phone,company:f.comp,field:f.field,pwdHint:f.hint,pwdAnswer:f.ans,status:'pending',createdAt:new Date().toISOString()};
+  if(f.title==='管理员')nm.status='active';
+  d.members.push(nm); save(d); setSession(null);
+  return{ok:true,msg:f.title==='管理员'?'管理员注册成功，请用账号密码登录':'注册成功，等会长通过后方可登录'};
+}
+function acctCheck(acct){
+  var d=db();
+  if(!acct)return{ok:false,msg:''};
+  if(!/^[a-zA-Z0-9]{4,16}$/.test(acct))return{ok:true,msg:'账号需为 4-16 位字母或数字'};
+  if(acct.toLowerCase()===d.president.account.toLowerCase())return{ok:false,msg:'该账号已被使用，请更换其他登录账号名'};
+  if(d.members.some(function(x){return x.account.toLowerCase()===acct.toLowerCase();}))return{ok:false,msg:'该账号已被注册，请更换其他登录账号名'};
+  return{ok:true,msg:'该账号可以使用'};
+}
+function pwdHint(acct){
+  var d=db();
+  if(acct===d.president.account)return{ok:true,isP:true,hint:''};
+  var m=d.members.find(function(x){return x.account===acct;});
+  if(!m)return{ok:false,msg:'账号不存在'};
+  if(!m.pwdHint)return{ok:false,msg:'该账号未设置密码提示，无法找回'};
+  return{ok:true,isP:false,hint:m.pwdHint};
+}
+function resetPwd(acct,authOrAns,pwd1,pwd2){
+  var d=db();
+  if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,8}$/.test(pwd1))return{ok:false,msg:'新密码须为 6-8 位，且包含大写字母、小写字母和数字'};
+  if(pwd1!==pwd2)return{ok:false,msg:'两次输入的新密码不一致'};
+  if(acct===d.president.account){
+    if(authOrAns!==AUTH_CODE)return{ok:false,msg:'授权码不正确，无法重置密码'};
+    d.president.password=pwd1; save(d);
+    return{ok:true,msg:'密码已重置，请用新密码登录'};
+  }
+  var m=d.members.find(function(x){return x.account===acct;});
+  if(!m)return{ok:false,msg:'账号不存在'};
+  if(authOrAns!==m.pwdAnswer)return{ok:false,msg:'密码答案不正确'};
+  m.password=pwd1; save(d);
+  return{ok:true,msg:'密码已重置，请用新密码登录'};
+}
+function doChangePwd(role,memberId,o){
+  var d=db();
+  var me=role==='president'?d.president:byId(memberId);
+  if(role==='president'||role==='manager'){
+    if(o.auth!==AUTH_CODE)return{ok:false,msg:'授权码不正确，无法修改密码'};
+  }
+  if(!me)return{ok:false,msg:'账号不存在'};
+  if(o.old!==me.password)return{ok:false,msg:'原密码不正确'};
+  if(role==='member'){
+    if(o.hint!==me.pwdHint||o.ans!==me.pwdAnswer)return{ok:false,msg:'密码提示或密码答案与注册时填写的不一致'};
+  }
+  if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,8}$/.test(o.nw))return{ok:false,msg:'新密码须为 6-8 位，且包含大写字母、小写字母和数字'};
+  if(o.nw!==o.nw2)return{ok:false,msg:'两次输入的新密码不一致'};
+  me.password=o.nw; save(d);
+  return{ok:true,msg:'密码修改成功'};
+}
+/* 审核 */
+function approveMember(id){ var d=db(); var m=d.members.find(function(x){return x.id===id;}); if(!m)return{ok:false,msg:'会员不存在'}; m.status='active'; save(d); return{ok:true,msg:'已通过该会员的注册申请'}; }
+function rejectMember(id){ var d=db(); var m=d.members.find(function(x){return x.id===id;}); if(!m)return{ok:false,msg:'会员不存在'}; m.status='rejected'; save(d); return{ok:true,msg:'已拒绝该会员的注册申请'}; }
+function pendingApply(){ return db().members.filter(function(x){return x.status==='pending';}).length; }
+/* 供需 */
+function upsertItem(f){
+  var d=db();
+  if(!f.title||!f.category||!f.desc)return{ok:false,msg:'请填写标题、品类与详细描述'};
+  var tags=(f.tags||'').split(/[,，、\s]+/).filter(Boolean);
+  if(f.id){ var it=d.items.find(function(x){return x.id===f.id;}); if(it){ it.title=f.title; it.category=f.category; it.desc=f.desc; it.tags=tags; it.type=f.type; save(d); return{ok:true,msg:'发布内容已更新'}; } }
+  d.items.unshift({id:uid('i'),memberId:f.memberId,type:f.type,category:f.category,title:f.title,desc:f.desc,tags:tags,status:'on',createdAt:new Date().toISOString()});
+  save(d);
+  return{ok:true,msg:'发布成功，系统将自动为您撮合'};
+}
+function toggleItem(id){ var d=db(); var it=d.items.find(function(x){return x.id===id;}); if(!it)return{ok:false,msg:'记录不存在'}; it.status=it.status==='on'?'off':'on'; save(d); return{ok:true,msg:it.status==='on'?'已上架':'已下架'}; }
+function delItem(id){ var d=db(); d.items=d.items.filter(function(x){return x.id!==id;}); save(d); }
+/* 撮合合同 */
+function myConfirmKey(x,memberId){ return x.demandMemberId===memberId?'confirmA':(x.supplyMemberId===memberId?'confirmB':null); }
+function confirmMatch(id,memberId){
+  var d=db(); var x=d.matches.find(function(y){return y.id===id;});
+  if(!x)return{ok:false,msg:'撮合不存在'};
+  var key=myConfirmKey(x,memberId);
+  if(!key)return{ok:false,msg:'该撮合与您无关'};
+  if(x[key])return{ok:false,msg:'您已确认过该交易'};
+  x[key]=true;
+  var both=x.confirmA&&x.confirmB;
+  if(both){ x.status='confirmed'; x.contract=makeContract(x); }
+  save(d);
+  return{ok:true,both:both,msg:both?'双方已确认交易，撮合合同已自动生成':'已确认交易，等待对方确认'};
+}
+function makeContract(x){
+  var d=db();
+  var dm=byId(x.demandMemberId),sm=byId(x.supplyMemberId);
+  var di=d.items.find(function(i){return i.id===x.demandItemId;}),si=d.items.find(function(i){return i.id===x.supplyItemId;});
+  return{id:'c_'+uid('x').slice(2),content:makeContractText(x,dm,sm,di,si),version:1,updatedAt:new Date().toISOString()};
+}
+function makeContractText(x,dm,sm,di,si){
+  var no=String(x.id).replace(/[^0-9a-z]/gi,'').toUpperCase().slice(-8)||'00000000';
+  var L=[];
+  L.push('商会会员撮合交易合同'); L.push('合同编号：HT-'+no); L.push('');
+  L.push('甲方（需求方）：'+(dm?dm.name:'')+'（'+(dm?dm.company:'')+'）');
+  L.push('乙方（供给方）：'+(sm?sm.name:'')+'（'+(sm?sm.company:'')+'）'); L.push('');
+  L.push('一、交易内容'); L.push('经商会平台智能撮合，双方就以下供需信息达成合作意向：');
+  L.push('  需求：'+(di?di.title:'')+'；供给：'+(si?si.title:'')+'。');
+  L.push('二、双方确认'); L.push('甲乙双方已通过商会撮合平台分别确认本次交易，确认时间以平台记录为准。');
+  L.push('三、履约约定'); L.push('双方应本着诚实信用原则履行合作内容，具体条款由双方另行协商签订正式合同。');
+  L.push('四、平台说明'); L.push('本合同由商会会员撮合平台根据双方确认自动生成，供双方存档备查。'); L.push('');
+  L.push('甲方确认：________　乙方确认：________');
+  L.push('商会见证：________　日期：'+new Date().toISOString().slice(0,10));
+  return L.join('\n');
+}
+function saveContract(matchId,content){
+  var d=db(); var x=d.matches.find(function(y){return y.id===matchId;});
+  if(!x)return{ok:false,msg:'撮合不存在'};
+  if(!content||!content.trim())return{ok:false,msg:'合同内容不能为空'};
+  if(!x.contract)x.contract={};
+  x.contract.content=content; x.contract.version=(x.contract.version||0)+1; x.contract.updatedAt=new Date().toISOString();
+  save(d);
+  return{ok:true,msg:'合同已修改，将同步到交易双方账号中'};
+}
+/* 联系请求 */
+function sendReq(fromId,itemId,message){
+  var d=db();
+  if(!message)return{ok:false,msg:'请填写咨询内容'};
+  var it=d.items.find(function(x){return x.id===itemId;});
+  if(!it)return{ok:false,msg:'供需信息不存在'};
+  var toId=it.memberId;
+  if(toId===fromId)return{ok:false,msg:'不能联系自己发布的信息'};
+  d.requests.unshift({id:uid('r'),fromMemberId:fromId,toMemberId:toId,itemId:itemId,message:message,status:'pending',createdAt:new Date().toISOString()});
+  save(d);
+  return{ok:true,msg:'已提交联系请求，会长核实后将为您转达联系方式'};
+}
+function markReqDone(id){ var d=db(); var r=d.requests.find(function(x){return x.id===id;}); if(!r)return{ok:false,msg:'请求不存在'}; r.status='done'; save(d); return{ok:true,msg:'已处理该请求'}; }
+function pendingPresReq(){ return db().requests.filter(function(x){return x.status==='pending';}).length; }
+/* 首页内容 */
+function saveHome(payload){ var d=db(); if(payload&&Array.isArray(payload.banners))d.home.banners=payload.banners; if(payload&&typeof payload.intro==='string')d.home.intro=payload.intro; save(d); return{ok:true,msg:'首页内容已保存'}; }
+function saveActivity(f){
+  var d=db();
+  if(!f.title||!f.time||!f.location)return{ok:false,msg:'请填写活动标题、时间与地点'};
+  var quota=parseInt(f.quota,10);
+  if(!quota||quota<1||quota>10000)return{ok:false,msg:'请填写有效的人数上限（1-10000）'};
+  if(f.id){ var a=d.home.activities.find(function(x){return x.id===f.id;}); if(a){ a.title=f.title; a.desc=f.desc||''; a.time=f.time; a.location=f.location; a.quota=quota; save(d); return{ok:true,msg:'活动已更新'}; } }
+  d.home.activities.unshift({id:uid('a'),title:f.title,desc:f.desc||'',time:f.time,location:f.location,quota:quota,joined:[],cancelled:[],status:'open',createdAt:new Date().toISOString()});
+  save(d);
+  return{ok:true,msg:'活动已发布'};
+}
+function delActivity(id){ var d=db(); d.home.activities=d.home.activities.filter(function(x){return x.id!==id;}); save(d); }
+function joinActivity(id,memberId){
+  var d=db(); var a=d.home.activities.find(function(x){return x.id===id;});
+  if(!a)return{ok:false,msg:'活动不存在'};
+  a.cancelled=a.cancelled||[];
+  if(a.cancelled.indexOf(memberId)>-1)return{ok:false,msg:'活动报名后取消就不能再参加了'};
+  if(a.joined.indexOf(memberId)>-1)return{ok:false,msg:'您已参加该活动，无需重复报名'};
+  if(a.joined.length>=a.quota)return{ok:false,msg:'活动名额已满，请关注下期活动'};
+  a.joined.push(memberId); save(d);
+  return{ok:true,msg:'报名成功，活动当天请准时参加'};
+}
+function leaveActivity(id,memberId){
+  var d=db(); var a=d.home.activities.find(function(x){return x.id===id;});
+  if(!a)return{ok:false,msg:'活动不存在'};
+  a.cancelled=a.cancelled||[];
+  var i=a.joined.indexOf(memberId);
+  if(i===-1)return{ok:false,msg:'您尚未报名该活动'};
+  a.joined.splice(i,1);
+  if(a.cancelled.indexOf(memberId)===-1)a.cancelled.push(memberId);
+  save(d);
+  return{ok:true,msg:'已取消报名，取消后不能再参加该活动'};
+}
+/* 备份恢复 */
+function exportJSON(){ return JSON.stringify(db(),null,2); }
+function importJSON(json){
+  try{
+    var d=JSON.parse(json);
+    if(!d||!d.president||!d.members)return{ok:false,msg:'文件格式不正确，请选择导出的备份文件'};
+    if(!d.items)d.items=[]; if(!d.matches)d.matches=[]; if(!d.requests)d.requests=[]; if(!d.home)d.home=newDB().home;
+    _inject(d);
+    return{ok:true,msg:'备份导入成功'};
+  }catch(e){ return{ok:false,msg:'文件格式不正确，请选择导出的备份文件'}; }
+}
+/*==NEXT==*/
+/* ================= 视图层 ================= */
+var S = { role: '', memberId: '', view: 'login', login: { mode: 0 }, f: {} };
+var VIEW_TITLE = {
+  login: '商会会员撮合平台', p_members: '会员管理', p_items: '供需信息', p_matches: '撮合记录', p_requests: '联系请求',
+  p_apply: '注册申请管理', p_dash: '数据统计看板', p_password: '修改密码', p_backup: '备份恢复',
+  m_home: '商会首页', m_square: '供需广场', m_mypub: '我的发布', m_mymatch: '我的撮合',
+  m_workbench: '我的工作台', m_password: '修改密码', m_activity: '活动详情',
+  mg_content: '首页管理', mg_activities: '活动管理', mg_password: '修改密码'
+};
+var EXTRA_PAGES = ['login', 'p_apply', 'p_dash', 'p_password', 'p_backup', 'm_workbench', 'm_password', 'm_activity'];
+var TAB_ROLE = { p_members: 'president', p_items: 'president', p_matches: 'president', p_requests: 'president', m_home: 'member', m_square: 'member', m_mypub: 'member', m_mymatch: 'member', mg_content: 'manager', mg_activities: 'manager', mg_password: 'manager' };
+var app = document.getElementById('app');
+
+function toast(msg, ms) { var t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; t.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:110px;z-index:200;background:rgba(23,29,44,.92);color:#fff;font-size:13px;padding:10px 18px;border-radius:10px;max-width:76%;text-align:center;transition:opacity .3s;'; document.body.appendChild(t); } t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._tm); t._tm = setTimeout(function () { t.style.opacity = '0'; }, ms || 2200); }
+function overlay(title, html, footHtml) {
+  var m = document.getElementById('overlay');
+  m.innerHTML = '<div class="overlay-body"><div class="overlay-head"><div class="overlay-title">' + title + '</div><button class="overlay-close" onclick="hideOverlay()">×</button></div><div class="overlay-content">' + html + '</div>' + (footHtml ? '<div class="overlay-foot">' + footHtml + '</div>' : '') + '</div>';
+  m.classList.add('show');
+}
+function hideOverlay() { document.getElementById('overlay').classList.remove('show'); }
+function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function badge(t, c) { return '<span class="badge ' + c + '">' + t + '</span>'; }
+
+function go(view) {
+  var ok = S.role ? true : (view === 'login');
+  if (!ok) { S.role = ''; S.memberId = ''; }
+  S.view = view;
+  try { location.hash = view; } catch (e) {}
+  render();
+}
+function back() {
+  if(S.view==='m_activity')return go('m_home');
+  if (location.hash) { try { history.back(); } catch (e) {} setTimeout(render, 30); }
+  else go('login');
+}
+window.addEventListener('hashchange', function () {
+  var v = location.hash.replace('#', '') || 'login';
+  if (v !== S.view) { S.view = v; render(); }
+});
+function render() {
+  if (S.view === 'login' || !S.view) { renderLogin(); return; }
+  if (!S.role) {
+    var sess = getSession();
+    if (sess && sess.role) { S.role = sess.role; S.memberId = sess.memberId || ''; }
+    else { go('login'); return; }
+  }
+  var allowed = true;
+  if (S.role === 'president' && !/^p_/.test(S.view)) allowed = false;
+  if (S.role === 'manager' && !/^mg_/.test(S.view)) allowed = false;
+  if (S.role === 'member' && !/^m_/.test(S.view)) allowed = false;
+  if (!allowed) { S.view = S.role === 'president' ? 'p_members' : (S.role === 'manager' ? 'mg_content' : 'm_home'); }
+  renderTopbar();
+  renderMain();
+  renderTabbar();
+}
+
+function renderTopbar() {
+  var v = S.view, title = VIEW_TITLE[v] || '';
+  var right = '';
+  var isTab = !!TAB_ROLE[v];
+  if (v === 'login') right = '';
+  else if (!isTab) right = '<button class="tb-btn" onclick="back()">‹</button>';
+  else if (S.role === 'president') right = '<button class="tb-btn" onclick="presMenu()">⋯</button>';
+  else if (S.role === 'member') right = '<button class="tb-btn" onclick="memMenu()">⋯</button>';
+  else if (S.role === 'manager') right = '<button class="tb-btn primary" onclick="mgAdd()">＋</button>';
+  app.innerHTML = '<div class="topbar"><div class="tt">' + title + '</div>' + right + '</div><div class="page ' + (isTab ? '' : 'page-no-tab') + '" id="page"></div>';
+}
+function renderTabbar() {
+  var tabs = S.role === 'president' ? PRES_TABS : (S.role === 'manager' ? MG_TABS : MEM_TABS);
+  var badgeKey = (S.role === 'president' && S.view === 'p_requests') ? pendingPresReq() : 0;
+  var html = '<div class="tabbar">';
+  tabs.forEach(function (t) {
+    var on = t[0] === S.view ? ' on' : '';
+    var red = '';
+    if (t[0] === 'p_requests' && badgeKey > 0) red = '<span class="tab-badge">' + (badgeKey > 99 ? '99+' : badgeKey) + '</span>';
+    html += '<div class="tab' + on + '" onclick="go(\'' + t[0] + '\')">' + red + '<span class="tab-pill">' + t[1] + '</span></div>';
+  });
+  html += '</div>';
+  var old = document.querySelector('.tabbar'); if (old) old.remove();
+  app.insertAdjacentHTML('beforeend', html);
+}
+
+/* ================= 登录 / 注册 / 忘记密码 ================= */
+function renderLogin() {
+  var L = S.login; var f = L;
+  var body = '';
+  if (L.mode === 0) {
+    body = '<div class="login-form">' + (db().init ? '' : '<div class="login-tip">系统首次使用：会长账号首次登录请在密码栏输入授权码</div>') +
+      '<div class="field"><div class="label">账号</div><input class="input" id="lg_acct" placeholder="请输入账号"></div>' +
+      '<div class="field"><div class="label">密码</div><div class="pwd-wrap"><input class="input" type="password" id="lg_pwd" placeholder="请输入密码"><span class="pwd-eye" onclick="togglePwd()">显</span></div></div>' +
+      '<button class="btn btn-primary btn-block login-btn" onclick="doLoginUI()">登 录</button>' +
+      '<div class="login-link" onclick="S.login.mode=2;render()">忘记密码？</div></div>';
+  } else if (L.mode === 1) {
+    body = '<div class="login-form">' + regForm() + '</div>';
+  } else if (L.mode === 2) {
+    body = '<div class="login-form"><div class="field"><div class="label">账号</div><input class="input" id="fg_acct" placeholder="请输入账号"></div>' +
+      '<button class="btn btn-primary btn-block" onclick="fgNext()">下一步</button>' +
+      '<div class="login-link" onclick="S.login.mode=0;render()">返回登录</div></div>';
+  } else if (L.mode === 3) {
+    body = '<div class="login-form">' + (L.isP ? '<div class="field"><div class="label">授权号</div><input class="input" type="password" id="fg_auth" placeholder="请输入会长授权号"></div>' : '<div class="login-tip">该账号的密码提示：' + esc(L.hint) + '</div><div class="field"><div class="label">密码答案</div><input class="input" id="fg_ans" placeholder="请输入密码答案"></div>') +
+      '<div class="field"><div class="label">新密码</div><input class="input" type="password" id="fg_p1" placeholder="6-8 位，含大小写字母与数字"></div>' +
+      '<div class="field"><div class="label">确认新密码</div><input class="input" type="password" id="fg_p2" placeholder="再次输入新密码"></div>' +
+      '<button class="btn btn-primary btn-block" onclick="fgReset()">重置密码</button>' +
+      '<div class="login-link" onclick="S.login.mode=0;render()">返回登录</div></div>';
+  }
+  app.innerHTML = '<div class="login-page"><div class="login-hero"><div class="login-logo">商</div><div class="login-title">商会会员撮合平台</div><div class="login-sub">供需对接 · 智能撮合 · 隐私保护</div></div>' +
+    '<div class="seg login-seg"><div class="seg-item' + (L.mode === 0 ? ' on' : '') + '" onclick="S.login.mode=0;render()">登录</div><div class="seg-item' + (L.mode === 1 ? ' on' : '') + '" onclick="S.login.mode=1;render()">注册</div></div>' + body + '</div>';
+}
+function regForm() {
+  return '<div class="field"><div class="label">登录账号</div><input class="input" id="rg_acct" placeholder="4-16 位字母或数字"></div>' +
+    '<div class="field"><div class="label">登录密码</div><input class="input" type="password" id="rg_pwd" placeholder="6-8 位，含大小写字母与数字"></div>' +
+    '<div class="hint">密码须为 6-8 位，且同时包含大写字母、小写字母和数字</div>' +
+    '<div class="field"><div class="label">确认密码</div><input class="input" type="password" id="rg_pwd2" placeholder="再次输入密码"></div>' +
+    '<div class="field"><div class="label">密码提示</div><input class="input" id="rg_hint" placeholder="中文安全问题，不少于 4 个字"></div>' +
+    '<div class="field"><div class="label">密码答案</div><input class="input" id="rg_ans" placeholder="不少于 8 个数字，或不少于 8 个汉字"></div>' +
+    '<div class="hint">密码提示须为中文（不少于 4 个字）；密码答案须为不少于 8 个数字，或不少于 8 个汉字</div>' +
+    '<div class="field"><div class="label">真实姓名</div><input class="input" id="rg_name" placeholder="用于会长核实身份"></div>' +
+    '<div class="field"><div class="label">职务</div><div class="picker-wrap" onclick="rgTitlePicker()"><span id="rg_title">会员</span><span class="picker-arrow">▾</span></div></div>' +
+    '<div id="rg_auth_wrap" style="display:none"><div class="field"><div class="label">授权号</div><input class="input" type="password" id="rg_auth" placeholder="会长/管理员注册需输入授权号"></div></div>' +
+    '<div class="field"><div class="label">称呼</div><div class="seg"><div class="seg-item on" id="rg_g0" onclick="rgGender(0)">先生</div><div class="seg-item" id="rg_g1" onclick="rgGender(1)">女士</div></div></div>' +
+    '<div class="field"><div class="label">年龄</div><input class="input" type="number" id="rg_age" placeholder="请输入年龄"></div>' +
+    '<div class="field"><div class="label">联系方式</div><input class="input" type="number" id="rg_phone" placeholder="请输入 11 位手机号码"></div>' +
+    '<div class="field"><div class="label">所属公司</div><input class="input" id="rg_comp" placeholder="公司或店铺名称"></div>' +
+    '<div class="field"><div class="label">服务领域</div><div class="picker-wrap" onclick="rgFieldPicker()"><span id="rg_field">' + FIELD_OPTIONS[0] + '</span><span class="picker-arrow">▾</span></div></div>' +
+    '<div id="rg_field_other" style="display:none"><div class="field"><div class="label">服务领域（自定义）</div><input class="input" id="rg_field_other_i" placeholder="请填写你的服务领域"></div></div>' +
+    '<button class="btn btn-primary btn-block" onclick="doRegisterUI()">注 册</button>' +
+    '<div class="hint" style="text-align:center;margin-top:10px">普通会员注册后需会长审核通过方可登录；选择「管理员」职务并输入授权码，注册后可直接登录</div>';
+}
+var RG = { title: '会员', gender: 0, field: FIELD_OPTIONS[0] };
+function rgTitlePicker() {
+  overlay('选择职务', TITLES.map(function (t, i) { return '<div class="detail-row" style="cursor:pointer" onclick="rgPickTitle(' + i + ')"><span class="v">' + t + '</span></div>'; }).join(''));
+}
+function rgPickTitle(i) {
+  RG.title = TITLES[i];
+  document.getElementById('rg_title').textContent = RG.title;
+  document.getElementById('rg_auth_wrap').style.display = (RG.title === '会长' || RG.title === '管理员') ? '' : 'none';
+  hideOverlay();
+}
+function rgGender(g) {
+  RG.gender = g;
+  document.getElementById('rg_g0').classList.toggle('on', g === 0);
+  document.getElementById('rg_g1').classList.toggle('on', g === 1);
+}
+function rgFieldPicker() {
+  overlay('选择服务领域', FIELD_OPTIONS.map(function (t, i) { return '<div class="detail-row" style="cursor:pointer" onclick="rgPickField(' + i + ')"><span class="v">' + t + '</span></div>'; }).join(''));
+}
+function rgPickField(i) {
+  RG.field = FIELD_OPTIONS[i];
+  document.getElementById('rg_field').textContent = RG.field;
+  document.getElementById('rg_field_other').style.display = RG.field === '其他' ? '' : 'none';
+  hideOverlay();
+}
+function togglePwd() {
+  var el = document.getElementById('lg_pwd');
+  if (el.type === 'password') { el.type = 'text'; event.target.textContent = '隐'; } else { el.type = 'password'; event.target.textContent = '显'; }
+}
+function doLoginUI() {
+  var acct = document.getElementById('lg_acct').value.trim();
+  var pwd = document.getElementById('lg_pwd').value;
+  if (!acct || !pwd) { toast('请输入账号和密码'); return; }
+  var r = doLogin(acct, pwd);
+  toast(r.msg);
+  if (r.ok) {
+    S.role = r.role; S.memberId = r.memberId || '';
+    setTimeout(function () { go(r.role === 'president' ? 'p_members' : (r.role === 'manager' ? 'mg_content' : 'm_home')); }, 500);
+  }
+}
+function doRegisterUI() {
+  var v = function (id) { var el = document.getElementById(id); return el ? el.value : ''; };
+  var f = {
+    acct: v('rg_acct').trim(), pwd: v('rg_pwd'), pwd2: v('rg_pwd2'), hint: v('rg_hint').trim(), ans: v('rg_ans').trim(),
+    name: v('rg_name').trim(), phone: v('rg_phone').trim(), comp: v('rg_comp').trim(), age: v('rg_age').trim(),
+    title: RG.title, auth: v('rg_auth').trim(), gender: RG.gender === 1 ? '女士' : '先生',
+    field: RG.field === '其他' ? v('rg_field_other_i').trim() : RG.field
+  };
+  if (!f.field && RG.field === '其他') { toast('请填写服务领域'); return; }
+  var r = doRegister(f);
+  toast(r.msg, 2800);
+  if (r.ok) { RG = { title: '会员', gender: 0, field: FIELD_OPTIONS[0] }; S.login.mode = 0; render(); }
+}
+function fgNext() {
+  var acct = document.getElementById('fg_acct').value.trim();
+  if (!acct) { toast('请输入账号'); return; }
+  var r = pwdHint(acct);
+  if (!r.ok) { toast(r.msg); return; }
+  S.login.isP = r.isP; S.login.hint = r.hint; S.login.mode = 3; S.login.fgAcct = acct; render();
+}
+function fgReset() {
+  var v = function (id) { var el = document.getElementById(id); return el ? el.value : ''; };
+  var authOrAns = S.login.isP ? v('fg_auth').trim() : v('fg_ans').trim();
+  if (!authOrAns) { toast(S.login.isP ? '请输入授权码' : '请输入密码答案'); return; }
+  var r = resetPwd(S.login.fgAcct, authOrAns, v('fg_p1'), v('fg_p2'));
+  toast(r.msg, 2600);
+  if (r.ok) { S.login.mode = 0; render(); }
+}
+
+/* ================= 会长端 ================= */
+var PF = { filters: [0, 0, 0, 0], detail: null, pub: false, reqItem: '', reqMsg: '' };
+var FILTER_DEFS = [
+  { k: 'title', label: '职务', opts: ['全部'].concat(TITLES), color: '#2b5cff' },
+  { k: 'status', label: '状态', opts: ['全部', '正常', '待审核', '已拒绝'], color: '#0d8a5c' },
+  { k: 'field', label: '服务领域', opts: ['全部'].concat(FIELD_OPTIONS), color: '#d6336c' },
+  { k: 'gender', label: '性别', opts: ['全部', '先生', '女士'], color: '#e08a00' }
+];
+function presMenu() {
+  overlay('操作', '<div class="detail-row" style="cursor:pointer" onclick="hideOverlay();go(\'p_dash\')"><span class="v">数据统计看板</span></div>' +
+    '<div class="detail-row" style="cursor:pointer" onclick="hideOverlay();go(\'p_backup\')"><span class="v">备份恢复</span></div>' +
+    '<div class="detail-row" style="cursor:pointer" onclick="hideOverlay();go(\'p_password\')"><span class="v">修改密码</span></div>' +
+    '<div class="detail-row" style="cursor:pointer" onclick="hideOverlay();logout()"><span class="v" style="color:#e04a4a">退出登录</span></div>');
+}
+function logout() { setSession(null); S.role = ''; S.memberId = ''; go('login'); }
+function renderMain() {
+  var el = document.getElementById('page');
+  if (S.view === 'p_members') el.innerHTML = renderPMembers();
+  else if (S.view === 'p_items') el.innerHTML = renderPItems();
+  else if (S.view === 'p_matches') el.innerHTML = renderPMatches();
+  else if (S.view === 'p_requests') el.innerHTML = renderPRequests();
+  else if (S.view === 'p_apply') el.innerHTML = renderPApply();
+  else if (S.view === 'p_dash') { el.innerHTML = renderPDash(); setTimeout(drawPDash, 50); }
+  else if (S.view === 'p_password') el.innerHTML = renderPPassword();
+  else if (S.view === 'p_backup') el.innerHTML = renderPBackup();
+  else if (S.view === 'm_home') el.innerHTML = renderMHome();
+  else if (S.view === 'm_square') el.innerHTML = renderMSquare();
+  else if (S.view === 'm_mypub') el.innerHTML = renderMMypub();
+  else if (S.view === 'm_mymatch') el.innerHTML = renderMMymatch();
+  else if (S.view === 'm_workbench') el.innerHTML = renderMWorkbench();
+  else if (S.view === 'm_password') el.innerHTML = renderMPassword();
+  else if (S.view === 'm_activity') { el.innerHTML = renderMActivity(); startBannerIfHome(); }
+  else if (S.view === 'mg_content') el.innerHTML = renderMgContent();
+  else if (S.view === 'mg_activities') el.innerHTML = renderMgActivities();
+  else if (S.view === 'mg_password') el.innerHTML = renderMgPassword();
+}
+function presFilterRow() {
+  return '<div class="filter-row">' + FILTER_DEFS.map(function (d, i) {
+    return '<div class="filter-pill" style="border-color:' + d.color + ';color:' + d.color + '"><select onchange="PF.filters[' + i + ']=+this.value;render()" style="color:' + d.color + '">' +
+      d.opts.map(function (o, j) { return '<option value="' + j + '"' + (PF.filters[i] === j ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select></div>';
+  }).join('') + '</div>';
+}
+function applyPFilters() {
+  var d = db(); var arr = d.members.slice();
+  var get = function (i) { return FILTER_DEFS[i].opts[PF.filters[i]]; };
+  if (get(0) !== '全部') arr = arr.filter(function (x) { return x.title === get(0); });
+  if (get(1) === '正常') arr = arr.filter(function (x) { return x.status === 'active'; });
+  if (get(1) === '待审核') arr = arr.filter(function (x) { return x.status === 'pending'; });
+  if (get(1) === '已拒绝') arr = arr.filter(function (x) { return x.status === 'rejected'; });
+  if (get(2) !== '全部') arr = arr.filter(function (x) { return x.field === get(2); });
+  if (get(3) !== '全部') arr = arr.filter(function (x) { return x.gender === get(3); });
+  return arr;
+}
+function renderPMembers() {
+  var p = pendingApply();
+  var arr = applyPFilters();
+  var grid = arr.map(function (m) { return '<div class="member-cell ' + (m.gender === '女士' ? 'm-female' : 'm-male') + '" onclick="openMemberDetail(\'' + m.id + '\')">' + anonName(m) + '</div>'; }).join('');
+  return '<div class="apply-entry" onclick="go(\'p_apply\')"><span>会员注册申请管理</span>' + (p > 0 ? '<span class="apply-badge">' + p + '</span>' : '') + '</div>' +
+    presFilterRow() +
+    '<div class="member-count">共 ' + arr.length + ' 位会员（点击查看详细资料）</div>' +
+    '<div class="member-grid">' + grid + '</div>' +
+    (arr.length === 0 ? '<div class="empty"><div class="t">暂无符合条件的会员</div></div>' : '');
+}
+function openMemberDetail(id) {
+  var m = byId(id); if (!m) return;
+  var reqs = db().requests.filter(function (r) { return (r.fromMemberId === id || r.toMemberId === id) && r.status === 'pending'; }).length;
+  var joined = db().home.activities.reduce(function (n, a) { return n + (a.joined.indexOf(id) > -1 ? 1 : 0); }, 0);
+  var stTxt = m.status === 'active' ? '正常' : (m.status === 'pending' ? '待审核' : '已拒绝');
+  overlay('会员详细资料',
+    '<div class="detail-head"><div class="avatar avatar-lg ' + (m.gender === '女士' ? 'm-female' : 'm-male') + '">' + anonName(m) + '</div><div><div class="detail-name">' + esc(m.name) + '</div><div class="detail-tags"><span class="d-tag">' + m.title + '</span><span class="d-tag">' + m.gender + '</span><span class="d-tag ' + (m.status === 'active' ? 'ok' : '') + '">' + stTxt + '</span></div></div></div>' +
+    '<div class="detail-row"><span class="k">账号</span><span class="v">' + esc(m.account) + '</span></div>' +
+    '<div class="detail-row"><span class="k">职务</span><span class="v">' + m.title + '</span></div>' +
+    '<div class="detail-row"><span class="k">所属公司</span><span class="v">' + esc(m.company) + '</span></div>' +
+    '<div class="detail-row"><span class="k">所属行业</span><span class="v">' + m.field + '</span></div>' +
+    '<div class="detail-row"><span class="k">年龄</span><span class="v">' + m.age + ' 岁</span></div>' +
+    '<div class="detail-row"><span class="k">联系方式</span><span class="v"><span class="phone-row">' + m.phone + '<button class="call-btn" onclick="callPhone(\'' + m.phone + '\')">电话</button></span></span></div>' +
+    '<div class="detail-row"><span class="k">待处理请求</span><span class="v">' + reqs + ' 条</span></div>' +
+    '<div class="detail-row"><span class="k">已报名活动</span><span class="v">' + joined + ' 场</span></div>');
+}
+function callPhone(p) { try { location.href = 'tel:' + p; } catch (e) {} }
+/* 供需信息（会长） */
+function renderPItems() {
+  PF.pSeg = PF.pSeg || 0; PF.pCat = PF.pCat || 0;
+  var d = db();
+  var arr = d.items.slice().sort(function (a, b) { return b.createdAt < a.createdAt ? -1 : 1; });
+  var segs = ['全部', '供给', '需求'];
+  if (PF.pSeg === 1) arr = arr.filter(function (x) { return x.type === 'supply'; });
+  if (PF.pSeg === 2) arr = arr.filter(function (x) { return x.type === 'demand'; });
+  var cats = ['全部'].concat(CATEGORIES);
+  if (PF.pCat > 0) arr = arr.filter(function (x) { return x.category === cats[PF.pCat]; });
+  var cards = arr.map(function (it) {
+    var m = byId(it.memberId);
+    return '<div class="card item-card" onclick="openItemDetail(\'' + it.id + '\')">' +
+      '<div class="item-top">' + badge(it.type === 'supply' ? '供给' : '需求', it.type === 'supply' ? 'b-supply' : 'b-demand') + badge(it.category, 'b-done') + '<span class="item-time">' + fmtTime(it.createdAt) + '</span></div>' +
+      '<div class="item-title">' + esc(it.title) + '</div><div class="item-desc">' + esc(it.desc) + '</div>' +
+      '<div class="item-bottom"><span class="tags">' + (it.tags || []).map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</span><span class="item-anon">' + (m ? anonName(m) : '-') + '</span></div></div>';
+  }).join('');
+  return '<div class="seg" style="margin-bottom:10px">' + segs.map(function (s, i) { return '<div class="seg-item' + (PF.pSeg === i ? ' on' : '') + '" onclick="PF.pSeg=' + i + ';render()">' + s + '</div>'; }).join('') + '</div>' +
+    '<div class="cat-pill" onclick="pCatPicker()">' + cats[PF.pCat] + ' ▾</div>' + cards +
+    (arr.length === 0 ? '<div class="empty"><div class="t">暂无该分类的供需信息</div></div>' : '');
+}
+function pCatPicker() {
+  var cats = ['全部'].concat(CATEGORIES);
+  overlay('选择品类', cats.map(function (c, i) { return '<div class="detail-row" style="cursor:pointer" onclick="PF.pCat=' + i + ';hideOverlay();render()"><span class="v">' + c + '</span></div>'; }).join(''));
+}
+function openItemDetail(id) {
+  var it = db().items.find(function (x) { return x.id === id; }); if (!it) return;
+  var m = byId(it.memberId);
+  overlay('供需详情',
+    '<div class="item-top">' + badge(it.type === 'supply' ? '供给' : '需求', it.type === 'supply' ? 'b-supply' : 'b-demand') + badge(it.category, 'b-done') + '<span class="item-time">' + fmtTime(it.createdAt) + '</span></div>' +
+    '<div class="item-title">' + esc(it.title) + '</div><div class="item-desc" style="color:#46556a">' + esc(it.desc) + '</div>' +
+    '<div class="tags" style="margin-top:8px">' + (it.tags || []).map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</div>' +
+    '<div class="detail-line">发布者：' + (m ? anonName(m) : '-') + '（匿名展示，真实信息仅会长可见）</div>' +
+    '<div class="detail-line">状态：' + (it.status === 'on' ? '上架中' : '已下架') + '</div>');
+}
+/* 撮合记录（会长） */
+function renderPMatches() {
+  var d = db(); runMatching();
+  var arr = d.matches.slice().sort(function (a, b) { return b.createdAt < a.createdAt ? -1 : 1; });
+  var cards = arr.map(function (x) {
+    var demM = byId(x.demandMemberId), supM = byId(x.supplyMemberId);
+    var st = x.status === 'new' ? 'b-new' : (x.status === 'contacted' ? 'b-contact' : (x.status === 'confirmed' ? 'b-confirmed' : 'b-done'));
+    var stT = x.status === 'new' ? '新建' : (x.status === 'contacted' ? '已联系' : (x.status === 'confirmed' ? '交易已确认' : '已完成'));
+    return '<div class="card" style="cursor:pointer" onclick="openMatchDetail(\'' + x.id + '\')">' +
+      '<div class="m-top">' + badge(x.category, 'b-done') + badge(stT, st) + '<span class="m-score">匹配度 ' + x.score + '%</span></div>' +
+      '<div class="m-summary">' + esc(x.summary) + '</div>' +
+      '<div class="m-meta">' + (demM ? anonName(demM) : '-') + ' 需求 ⇄ ' + (supM ? anonName(supM) : '-') + ' 供给 · ' + fmtTime(x.createdAt) + '</div>' +
+      (x.contract ? '<span class="m-contract-tag">撮合合同已生成</span>' : '') + '</div>';
+  }).join('');
+  return '<div class="section-title">系统自动撮合：会员需求与服务匹配一致时自动生成，双方确认后自动生成撮合合同</div>' + cards +
+    (arr.length === 0 ? '<div class="empty"><div class="t">暂无撮合记录</div><div class="s">会员发布供需后，系统将自动比对并撮合</div></div>' : '');
+}
+function openMatchDetail(id) {
+  var d = db(); var x = d.matches.find(function (y) { return y.id === id; }); if (!x) return;
+  var demM = byId(x.demandMemberId), supM = byId(x.supplyMemberId);
+  var di = d.items.find(function (i) { return i.id === x.demandItemId; }), si = d.items.find(function (i) { return i.id === x.supplyItemId; });
+  var stT = x.status === 'new' ? '新建' : (x.status === 'contacted' ? '已联系' : (x.status === 'confirmed' ? '交易已确认' : '已完成'));
+  var contractHtml = x.contract ? '<div class="contract-box"><div class="contract-title">撮合合同' + (x.contract.version > 1 ? '（已修订 v' + x.contract.version + '）' : '') + '</div><pre class="contract-content" id="ct_edit">' + esc(x.contract.content) + '</pre><button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="saveContractUI(\'' + id + '\')">保存修改并发送双方</button></div>' : '';
+  overlay('撮合详情',
+    '<div class="m-top">' + badge(x.category, 'b-done') + '<span class="m-score">匹配度 ' + x.score + '%</span>' + badge(stT, 'b-confirmed') + '</div>' +
+    '<div class="detail-line">需求方：' + (demM ? anonName(demM) : '-') + '（' + (di ? esc(di.title) : '') + '）</div>' +
+    '<div class="detail-line">供给方：' + (supM ? anonName(supM) : '-') + '（' + (si ? esc(si.title) : '') + '）</div>' +
+    '<div class="detail-line">撮合时间：' + fmtTime(x.createdAt) + '</div>' + contractHtml +
+    (x.contract ? '' : '<div class="detail-line">双方确认交易后自动生成撮合合同</div>'));
+}
+function saveContractUI(id) {
+  var el = document.getElementById('ct_edit');
+  var r = saveContract(id, el.innerText);
+  toast(r.msg, 2600);
+  if (r.ok) { hideOverlay(); render(); }
+}
+/* 联系请求（会长） */
+function renderPRequests() {
+  var d = db();
+  var arr = d.requests.slice().sort(function (a, b) { return b.createdAt < a.createdAt ? -1 : 1; });
+  var cards = arr.map(function (r) {
+    var fm = byId(r.fromMemberId), tm = byId(r.toMemberId);
+    var it = d.items.find(function (x) { return x.id === r.itemId; });
+    return '<div class="card"><div class="r-top">' + badge(r.status === 'pending' ? '待处理' : '已处理', r.status === 'pending' ? 'b-pending' : 'b-done') + '<span class="item-time">' + fmtTime(r.createdAt) + '</span></div>' +
+      '<div class="item-title">' + (it ? esc(it.title) : '') + '</div>' +
+      '<div class="r-msg">' + esc(r.message) + '</div>' +
+      '<div class="r-box"><div class="r-line">申请方：' + (fm ? anonName(fm) : '-') + ' · ' + (fm ? esc(fm.name) : '') + ' · ' + (fm ? fm.phone : '') + '<button class="call-btn" onclick="callPhone(\'' + (fm ? fm.phone : '') + '\')">电话</button></div>' +
+      '<div class="r-line">被申请方：' + (tm ? anonName(tm) : '-') + ' · ' + (tm ? esc(tm.name) : '') + ' · ' + (tm ? tm.phone : '') + '<button class="call-btn" onclick="callPhone(\'' + (tm ? tm.phone : '') + '\')">电话</button></div></div>' +
+      (r.status === 'pending' ? '<button class="btn btn-primary btn-sm" onclick="markDone(\'' + r.id + '\')">标记已处理</button>' : '') + '</div>';
+  }).join('');
+  return '<div class="section-title">会员发布供需后，可在线申请获取对方联系方式；您处理后联系双方转达</div>' + cards +
+    (arr.length === 0 ? '<div class="empty"><div class="t">暂无联系请求</div></div>' : '');
+}
+function markDone(id) { var r = markReqDone(id); toast(r.msg); render(); }
+/* 注册申请管理 */
+function renderPApply() {
+  var list = db().members.filter(function (x) { return x.status === 'pending'; });
+  var cards = list.map(function (m) {
+    return '<div class="card"><div class="detail-head"><div class="avatar avatar-sm ' + (m.gender === '女士' ? 'm-female' : 'm-male') + '">' + anonName(m) + '</div><div><div class="detail-name">' + esc(m.name) + '（' + m.gender + '）</div><div class="detail-tags"><span class="d-tag">' + m.title + '</span><span class="d-tag">' + esc(m.company) + '</span></div></div></div>' +
+      '<div class="detail-row"><span class="k">账号</span><span class="v">' + esc(m.account) + '</span></div>' +
+      '<div class="detail-row"><span class="k">年龄</span><span class="v">' + m.age + ' 岁</span></div>' +
+      '<div class="detail-row"><span class="k">服务领域</span><span class="v">' + m.field + '</span></div>' +
+      '<div class="detail-row"><span class="k">联系方式</span><span class="v">' + m.phone + '</span></div>' +
+      '<div class="detail-row"><span class="k">申请时间</span><span class="v">' + fmtTime(m.createdAt) + '</span></div>' +
+      '<div class="op-row"><button class="btn btn-primary btn-sm" onclick="approveUI(\'' + m.id + '\')">通过</button><button class="btn btn-danger btn-sm" onclick="rejectUI(\'' + m.id + '\')">拒绝</button></div></div>';
+  }).join('');
+  return '<div class="section-title">待审核申请（' + list.length + '）</div>' + cards +
+    (list.length === 0 ? '<div class="empty"><div class="t">暂无待审核的注册申请</div></div>' : '');
+}
+function approveUI(id) { var r = approveMember(id); toast(r.msg); render(); }
+function rejectUI(id) { var r = rejectMember(id); toast(r.msg); render(); }
+/* 数据统计看板 */
+function renderPDash() {
+  var d = db();
+  var members = d.members.filter(function (x) { return x.status === 'active'; });
+  var ageOf = function (a) { if (a >= 18 && a <= 30) return 0; if (a <= 40) return 1; if (a <= 50) return 2; if (a <= 60) return 3; return 4; };
+  var male = 0, female = 0, age = [0, 0, 0, 0, 0];
+  members.forEach(function (m) { if (m.gender === '女士') female++; else male++; age[ageOf(m.age)]++; });
+  var items = d.items.filter(function (i) { return i.status === 'on'; });
+  var supF = function (g) { return items.filter(function (i) { var m = byId(i.memberId); return m && (g === '女士' ? m.gender === '女士' : m.gender !== '女士'); }); };
+  var supM = supF('先生').length, demM = items.filter(function (i) { var m = byId(i.memberId); return m && m.gender !== '女士' && i.type === 'demand'; }).length;
+  var supF2 = supF('女士').length, demF = items.filter(function (i) { var m = byId(i.memberId); return m && m.gender === '女士' && i.type === 'demand'; }).length;
+  var byAge = function (g) { var out = [0, 0, 0, 0, 0]; items.forEach(function (i) { var m = byId(i.memberId); if (!m) return; if (g === '女士' ? m.gender !== '女士' : m.gender === '女士') return; out[ageOf(m.age)]++; }); return out; };
+  var ageM = byAge('先生'), ageF = byAge('女士');
+  var chartBox = function (id, title) { return '<div class="card"><div class="section-title" style="margin-top:0">' + title + '</div><div class="chart-box" id="' + id + '"></div></div>'; };
+  return '<div class="section-title">会员注册数据统计</div>' +
+    chartBox('c_gender', '注册会员男女比例') + chartBox('c_age', '注册会员年龄分布') +
+    '<div class="section-title">供需分布统计</div>' + chartBox('c_sm', '男性会员供需分布') + chartBox('c_sf', '女性会员供需分布') +
+    chartBox('c_am', '男性会员按年龄段供需分布') + chartBox('c_af', '女性会员按年龄段供需分布') +
+    '<div id="dash_data" style="display:none">' + JSON.stringify({ male: male, female: female, age: age, sm: supM, dm: demM, sf: supF2, df: demF, am: ageM, af: ageF }) + '</div>';
+}
+function ensureEcharts(cb) {
+  if (typeof echarts !== 'undefined') { cb(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js';
+  s.onload = cb;
+  s.onerror = function () { toast('图表组件加载失败（需联网），可稍后重试'); };
+  document.head.appendChild(s);
+}
+function drawPDash() { ensureEcharts(function () { drawCharts(); }); }
+function drawCharts() {
+  var el = document.getElementById('dash_data');
+  if (!el) return;
+  var data = JSON.parse(el.textContent);
+  var pie = function (id, d) {
+    var c = echarts.init(document.getElementById(id));
+    c.setOption({
+      color: ['#2b5cff', '#ff8fab', '#e08a00', '#23c16b', '#a06bff'],
+      tooltip: { trigger: 'item' },
+      legend: { bottom: 0, textStyle: { fontSize: 11 } },
+      series: [{ type: 'pie', radius: ['38%', '66%'], center: ['50%', '44%'], label: { show: false }, data: d.map(function (x) { return { name: x[0], value: x[1] }; }) }]
+    });
+  };
+  var bar = function (id, d, labels) {
+    var c = echarts.init(document.getElementById(id));
+    c.setOption({
+      color: ['#2b5cff'],
+      tooltip: {},
+      grid: { left: 36, right: 12, top: 24, bottom: 26 },
+      xAxis: { type: 'category', data: labels, axisLabel: { fontSize: 10 } },
+      yAxis: { type: 'value', minInterval: 1, axisLabel: { fontSize: 10 } },
+      series: [{ type: 'bar', data: d, barWidth: '52%', label: { show: true, position: 'top', fontSize: 10 } }]
+    });
+  };
+  var ageLabels = ['18-30', '31-40', '41-50', '51-60', '60+'];
+  pie('c_gender', [['男', data.male], ['女', data.female]]);
+  bar('c_age', data.age, ageLabels);
+  pie('c_sm', [['供给', data.sm], ['需求', data.dm]]);
+  pie('c_sf', [['供给', data.sf], ['需求', data.df]]);
+  pie('c_am', ageLabels.map(function (l, i) { return [l, data.am[i]]; }));
+  pie('c_af', ageLabels.map(function (l, i) { return [l, data.af[i]]; }));
+}
+/* 会长改密 / 备份 */
+function renderPPassword() {
+  return '<div class="card"><div class="section-title" style="margin-top:0">修改密码</div><div class="login-tip">会长/管理员修改密码需输入授权号</div>' +
+    '<div class="field"><div class="label">授权号</div><input class="input" type="password" id="pw_auth" placeholder="请输入授权号"></div>' +
+    '<div class="field"><div class="label">原密码</div><input class="input" type="password" id="pw_old" placeholder="请输入原密码"></div>' +
+    '<div class="field"><div class="label">新密码</div><input class="input" type="password" id="pw_n1" placeholder="6-8 位，含大小写字母与数字"></div>' +
+    '<div class="field"><div class="label">确认新密码</div><input class="input" type="password" id="pw_n2" placeholder="再次输入新密码"></div>' +
+    '<button class="btn btn-primary btn-block" onclick="pwSubmit()">确认修改</button></div>';
+}
+function pwSubmit() {
+  var v = function (id) { return document.getElementById(id).value; };
+  var r = doChangePwd(S.role === 'manager' ? 'manager' : 'president', S.memberId, { auth: v('pw_auth').trim(), old: v('pw_old'), nw: v('pw_n1'), nw2: v('pw_n2') });
+  toast(r.msg, 2600);
+}
+function renderPBackup() {
+  return '<div class="card"><div class="section-title" style="margin-top:0">备份恢复</div>' +
+    '<div class="login-tip">导出备份：可将全部数据（会员、供需、撮合、合同、活动、首页内容）保存到手机/电脑任意位置；导入备份：从备份文件恢复全部数据。</div>' +
+    '<button class="btn btn-primary btn-block" style="margin-bottom:10px" onclick="doExport()">导出备份</button>' +
+    '<button class="btn btn-ghost btn-block" onclick="document.getElementById(\'imp_file\').click()">导入备份</button>' +
+    '<input type="file" id="imp_file" accept=".json,application/json" style="display:none" onchange="doImport(this)"></div>';
+}
+function doExport() {
+  var blob = new Blob([exportJSON()], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '商会会员撮合平台-备份-' + new Date().toISOString().slice(0, 10) + '.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  toast('备份已导出，请选择保存位置');
+}
+function doImport(inp) {
+  var file = inp.files && inp.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function () {
+    var r = importJSON(String(reader.result));
+    toast(r.msg, 2800);
+    if (r.ok) render();
+  };
+  reader.readAsText(file);
+}
+/*==NEXT2==*/
+/* ================= 会员端 ================= */
+var MF = { seg: 0, cat: 0, detail: null, pub: false, reqItem: '', reqMsg: '' };
+function memMenu() {
+  overlay('操作', '<div class="detail-row" style="cursor:pointer" onclick="hideOverlay();go(\'m_workbench\')"><span class="v">工作台</span></div>' +
+    '<div class="detail-row" style="cursor:pointer" onclick="hideOverlay();go(\'m_password\')"><span class="v">修改密码</span></div>' +
+    '<div class="detail-row" style="cursor:pointer" onclick="hideOverlay();logout()"><span class="v" style="color:#e04a4a">退出登录</span></div>');
+}
+function renderMHome() {
+  var d = db();
+  var me = byId(S.memberId);
+  var acts = d.home.activities.slice().sort(function (x, y) { return x.time < y.time ? -1 : 1; }).map(function (a) {
+    var joined = a.joined || [], cancelled = a.cancelled || [];
+    var st = cancelled.indexOf(S.memberId) > -1 ? '<span class="badge b-pending">已取消</span>' : (joined.indexOf(S.memberId) > -1 ? '<span class="badge b-confirmed">已报名</span>' : (joined.length >= a.quota ? '<span class="badge b-done">已满员</span>' : '<span class="badge b-new">报名中</span>'));
+    return '<div class="card act-card" onclick="go(\'m_activity\');S.actId=\'' + a.id + '\'">' +
+      '<div class="act-title-row"><div class="act-title">' + esc(a.title) + '</div>' + st + '</div>' +
+      '<div class="act-line">时间：' + esc(a.time) + '</div><div class="act-line">地点：' + esc(a.location) + '</div>' +
+      '<div class="act-line">名额：' + joined.length + ' / ' + a.quota + '</div></div>';
+  }).join('');
+  return '<div class="home-hello">' + (me ? anonName(me) : '会员') + '，欢迎回到商会</div>' +
+    '<div class="home-sub">' + (me ? me.title + ' · ' + esc(me.company) : '') + '</div>' +
+    '<div class="banner" id="banner">' + d.home.banners.map(function (b, i) { return '<div class="banner-item' + (i === 0 ? ' on' : '') + '"><div class="banner-title">' + esc(b.title) + '</div><div class="banner-sub">' + esc(b.sub) + '</div></div>'; }).join('') +
+    '<div class="banner-dots">' + d.home.banners.map(function (_, i) { return '<i class="' + (i === 0 ? 'on' : '') + '" data-i="' + i + '"></i>'; }).join('') + '</div></div>' +
+    '<div class="card"><div class="section-title" style="margin-top:0">商会简介</div><div class="intro-text">' + esc(d.home.intro) + '</div></div>' +
+    '<div class="section-title">活动邀请</div>' + acts +
+    (d.home.activities.length === 0 ? '<div class="empty"><div class="t">暂无活动邀请</div></div>' : '') +
+    '<div class="section-title">更多功能</div><div class="more-grid">' +
+    '<div class="more-card" onclick="go(\'m_workbench\')"><div class="more-name">工作台</div><div class="more-sub">我的数据概览</div></div>' +
+    '<div class="more-card" onclick="go(\'m_password\')"><div class="more-name">修改密码</div><div class="more-sub">安全设置</div></div>' +
+    '<div class="more-card" onclick="logout()"><div class="more-name">退出登录</div><div class="more-sub">切换账号</div></div></div>';
+}
+var bannerTimer = null;
+function startBannerIfHome() {
+  if (S.view !== 'm_home') return;
+  clearInterval(bannerTimer);
+  var items = document.querySelectorAll('.banner-item'), dots = document.querySelectorAll('.banner-dots i');
+  if (!items.length) return;
+  var cur = 0;
+  bannerTimer = setInterval(function () {
+    items[cur].classList.remove('on'); if (dots[cur]) dots[cur].classList.remove('on');
+    cur = (cur + 1) % items.length;
+    items[cur].classList.add('on'); if (dots[cur]) dots[cur].classList.add('on');
+  }, 3500);
+}
+function renderMSquare() {
+  var d = db(); runMatching();
+  var cats = ['全部'].concat(FIELD_OPTIONS);
+  var segs = ['全部', '供给', '需求'];
+  var arr = d.items.slice().sort(function (a, b) { return b.createdAt < a.createdAt ? -1 : 1; });
+  if (MF.seg === 1) arr = arr.filter(function (x) { return x.type === 'supply'; });
+  if (MF.seg === 2) arr = arr.filter(function (x) { return x.type === 'demand'; });
+  if (MF.cat > 0) arr = arr.filter(function (x) { return x.category === cats[MF.cat]; });
+  var cards = arr.map(function (it) {
+    var m = byId(it.memberId);
+    return '<div class="card item-card" onclick="openSquareItem(\'' + it.id + '\')">' +
+      (it.memberId === S.memberId ? '<span class="mine-tag">我发布的</span>' : '') +
+      '<div class="item-top">' + badge(it.type === 'supply' ? '供给' : '需求', it.type === 'supply' ? 'b-supply' : 'b-demand') + badge(it.category, 'b-done') + '<span class="item-time">' + fmtTime(it.createdAt) + '</span></div>' +
+      '<div class="item-title">' + esc(it.title) + '</div><div class="item-desc">' + esc(it.desc) + '</div>' +
+      '<div class="item-bottom"><span class="tags">' + (it.tags || []).map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</span><span class="item-anon">' + (m ? anonName(m) : '-') + '</span></div></div>';
+  }).join('');
+  return '<div class="seg" style="margin-bottom:10px">' + segs.map(function (s, i) { return '<div class="seg-item' + (MF.seg === i ? ' on' : '') + '" onclick="MF.seg=' + i + ';render()">' + s + '</div>'; }).join('') + '</div>' +
+    '<div class="cat-pill" onclick="sqCatPicker()">' + cats[MF.cat] + ' ▾</div>' + cards +
+    (arr.length === 0 ? '<div class="empty"><div class="t">暂无该分类的供需信息</div></div>' : '') +
+    '<button class="btn btn-primary fab" onclick="openPubUI()">发布供需</button>';
+}
+function sqCatPicker() {
+  overlay('选择服务领域', FIELD_OPTIONS.map(function (c, i) { return '<div class="detail-row" style="cursor:pointer" onclick="MF.cat=' + i + ';hideOverlay();render()"><span class="v">' + c + '</span></div>'; }).join(''));
+}
+function openSquareItem(id) {
+  var it = db().items.find(function (x) { return x.id === id; }); if (!it) return;
+  var m = byId(it.memberId);
+  var mine = it.memberId === S.memberId;
+  var contact = mine ? '<div class="detail-line" style="color:#e08a00">这是您自己发布的信息，无需联系</div>' :
+    '<div class="field" style="margin-top:14px"><div class="label">咨询内容</div><textarea class="input" id="req_msg" placeholder="请填写想咨询的内容，会长核实后将为您转达联系方式"></textarea></div>' +
+    '<button class="btn btn-primary btn-block" onclick="submitReq(\'' + id + '\')">在线联系（会长转达联系方式）</button>';
+  overlay('供需详情',
+    '<div class="item-top">' + badge(it.type === 'supply' ? '供给' : '需求', it.type === 'supply' ? 'b-supply' : 'b-demand') + badge(it.category, 'b-done') + '<span class="item-time">' + fmtTime(it.createdAt) + '</span></div>' +
+    '<div class="item-title">' + esc(it.title) + '</div><div class="item-desc" style="color:#46556a">' + esc(it.desc) + '</div>' +
+    '<div class="tags" style="margin-top:8px">' + (it.tags || []).map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</div>' +
+    '<div class="detail-line">发布者：' + (m ? anonName(m) : '-') + '（匿名展示，真实信息仅会长可见）</div>' + contact);
+}
+function submitReq(id) {
+  var msg = document.getElementById('req_msg').value;
+  var r = sendReq(S.memberId, id, msg);
+  toast(r.msg, 2600);
+  if (r.ok) hideOverlay();
+}
+function openPubUI() {
+  var cats = FIELD_OPTIONS;
+  overlay('发布供需',
+    '<div class="field"><div class="label">类型</div><div class="seg"><div class="seg-item on" id="pub_t1" onclick="pubType(1)">供给（我能提供）</div><div class="seg-item" id="pub_t2" onclick="pubType(2)">需求（我想购买）</div></div></div>' +
+    '<div class="field"><div class="label">标题</div><input class="input" id="pub_title" placeholder="一句话说明供给或需求"></div>' +
+    '<div class="field"><div class="label">服务领域</div><div class="picker-wrap" onclick="pubCatPicker()"><span id="pub_cat">' + cats[0] + '</span><span class="picker-arrow">▾</span></div></div>' +
+    '<div class="field"><div class="label">详细描述</div><textarea class="input" id="pub_desc" placeholder="请详细描述内容、数量、合作要求等"></textarea></div>' +
+    '<div class="field"><div class="label">关键词（逗号分隔）</div><input class="input" id="pub_tags" placeholder="如：蔬菜, 配送, 批发"></div>' +
+    '<div class="overlay-foot"><button class="btn btn-ghost" onclick="hideOverlay()">取消</button><button class="btn btn-primary" onclick="pubSubmit()">发布</button></div>');
+  PF.pubType = 1; PF.pubCat = cats[0];
+}
+function pubType(t) { PF.pubType = t; document.getElementById('pub_t1').classList.toggle('on', t === 1); document.getElementById('pub_t2').classList.toggle('on', t === 2); }
+function pubCatPicker() {
+  overlay('选择服务领域', FIELD_OPTIONS.map(function (c, i) { return '<div class="detail-row" style="cursor:pointer" onclick="PF.pubCat=\'' + c + '\';document.getElementById(\'pub_cat\').textContent=PF.pubCat;hideOverlay()"><span class="v">' + c + '</span></div>'; }).join(''));
+}
+function pubSubmit() {
+  var v = function (id) { var el = document.getElementById(id); return el ? el.value : ''; };
+  var f = { memberId: S.memberId, type: PF.pubType === 2 ? 'demand' : 'supply', title: v('pub_title').trim(), category: PF.pubCat === '其他' ? '' : PF.pubCat, desc: v('pub_desc').trim(), tags: v('pub_tags').trim() };
+  if (!f.category) { toast('请选择服务领域（可选「其他」自行填写）'); return; }
+  var r = upsertItem(f);
+  toast(r.msg, 2600);
+  if (r.ok) { hideOverlay(); render(); }
+}
+/* 我的发布 */
+function renderMMypub() {
+  var arr = db().items.filter(function (x) { return x.memberId === S.memberId; }).sort(function (a, b) { return b.createdAt < a.createdAt ? -1 : 1; });
+  var cards = arr.map(function (it) {
+    return '<div class="card"><div class="item-top">' + badge(it.type === 'supply' ? '供给' : '需求', it.type === 'supply' ? 'b-supply' : 'b-demand') + badge(it.category, 'b-done') + badge(it.status === 'on' ? '上架中' : '已下架', it.status === 'on' ? 'b-confirmed' : 'b-done') + '<span class="item-time">' + fmtTime(it.createdAt) + '</span></div>' +
+      '<div class="item-title">' + esc(it.title) + '</div><div class="item-desc">' + esc(it.desc) + '</div>' +
+      '<div class="tags" style="margin-top:8px">' + (it.tags || []).map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</div>' +
+      '<div class="op-row"><button class="btn btn-ghost btn-sm" onclick="toggleUI(\'' + it.id + '\')">' + (it.status === 'on' ? '下架' : '上架') + '</button>' +
+      '<button class="btn btn-primary-soft btn-sm" onclick="openEditPub(\'' + it.id + '\')">编辑</button>' +
+      '<button class="btn btn-danger btn-sm" onclick="delPub(\'' + it.id + '\')">删除</button></div></div>';
+  }).join('');
+  return cards + (arr.length === 0 ? '<div class="empty"><div class="t">您还没有发布供需信息</div><div class="s">到「供需」页点击右下角「发布供需」即可发布</div></div>' : '');
+}
+function toggleUI(id) { var r = toggleItem(id); toast(r.msg); render(); }
+function delPub(id) {
+  if (!confirm('确定删除这条供需信息吗？删除后不可恢复。')) return;
+  delItem(id); render();
+}
+function openEditPub(id) {
+  var it = db().items.find(function (x) { return x.id === id; }); if (!it) return;
+  var cats = FIELD_OPTIONS;
+  PF.editId = id;
+  overlay('编辑供需',
+    '<div class="field"><div class="label">标题</div><input class="input" id="ed_title" value="' + esc(it.title) + '"></div>' +
+    '<div class="field"><div class="label">服务领域</div><div class="picker-wrap" onclick="edCatPicker()"><span id="ed_cat">' + it.category + '</span><span class="picker-arrow">▾</span></div></div>' +
+    '<div class="field"><div class="label">详细描述</div><textarea class="input" id="ed_desc">' + esc(it.desc) + '</textarea></div>' +
+    '<div class="field"><div class="label">关键词</div><input class="input" id="ed_tags" value="' + esc((it.tags || []).join('，')) + '"></div>' +
+    '<div class="overlay-foot"><button class="btn btn-ghost" onclick="hideOverlay()">取消</button><button class="btn btn-primary" onclick="editSubmit()">保存</button></div>');
+}
+function edCatPicker() {
+  overlay('选择服务领域', FIELD_OPTIONS.map(function (c) { return '<div class="detail-row" style="cursor:pointer" onclick="document.getElementById(\'ed_cat\').textContent=\'' + c + '\';hideOverlay()"><span class="v">' + c + '</span></div>'; }).join(''));
+}
+function editSubmit() {
+  var v = function (id) { var el = document.getElementById(id); return el ? el.value : ''; };
+  var it = db().items.find(function (x) { return x.id === PF.editId; });
+  var f = { id: PF.editId, memberId: S.memberId, type: it.type, title: v('ed_title').trim(), category: document.getElementById('ed_cat').textContent, desc: v('ed_desc').trim(), tags: v('ed_tags').trim() };
+  if (!f.category) { toast('请选择服务领域'); return; }
+  var r = upsertItem(f);
+  toast(r.msg); if (r.ok) { hideOverlay(); render(); }
+}
+/* 我的撮合 */
+function renderMMymatch() {
+  var d = db(); runMatching();
+  var arr = d.matches.filter(function (x) { return x.demandMemberId === S.memberId || x.supplyMemberId === S.memberId; }).sort(function (a, b) { return b.createdAt < a.createdAt ? -1 : 1; });
+  var cards = arr.map(function (x) {
+    var demM = byId(x.demandMemberId), supM = byId(x.supplyMemberId);
+    var key = myConfirmKey(x, S.memberId);
+    var myC = key ? !!x[key] : false, otherC = key === 'confirmA' ? !!x.confirmB : !!x.confirmA;
+    var st = x.status === 'new' ? 'b-new' : (x.status === 'contacted' ? 'b-contact' : (x.status === 'confirmed' ? 'b-confirmed' : 'b-done'));
+    var stT = x.status === 'new' ? '新建' : (x.status === 'contacted' ? '已联系' : (x.status === 'confirmed' ? '交易已确认' : '已完成'));
+    return '<div class="card" style="cursor:pointer" onclick="openMyMatch(\'' + x.id + '\')">' +
+      '<div class="m-top">' + badge(x.category, 'b-done') + badge(stT, st) + '<span class="m-score">' + x.score + '%</span></div>' +
+      '<div class="m-summary">' + esc(x.summary) + '</div>' +
+      '<div class="m-meta">您' + (myC ? '已' : '未') + '确认 · 对方' + (otherC ? '已' : '未') + '确认 · ' + fmtTime(x.createdAt) + '</div>' +
+      (key && !myC && x.status !== 'confirmed' ? '<button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="event.stopPropagation();confirmUI(\'' + x.id + '\')">确认交易</button>' : '') +
+      (x.contract ? '<span class="m-contract-tag">撮合合同已生成</span>' : '') + '</div>';
+  }).join('');
+  return '<div class="section-title">与您相关的撮合记录：双方确认交易后自动生成撮合合同</div>' + cards +
+    (arr.length === 0 ? '<div class="empty"><div class="t">暂无与您相关的撮合</div><div class="s">发布供需后，系统将自动为您撮合匹配</div></div>' : '');
+}
+function confirmUI(id) {
+  var r = confirmMatch(id, S.memberId);
+  alert(r.msg);
+  render();
+}
+function openMyMatch(id) {
+  var d = db(); var x = d.matches.find(function (y) { return y.id === id; }); if (!x) return;
+  var demM = byId(x.demandMemberId), supM = byId(x.supplyMemberId);
+  var di = d.items.find(function (i) { return i.id === x.demandItemId; }), si = d.items.find(function (i) { return i.id === x.supplyItemId; });
+  var stT = x.status === 'new' ? '新建' : (x.status === 'contacted' ? '已联系' : (x.status === 'confirmed' ? '交易已确认' : '已完成'));
+  overlay('撮合详情',
+    '<div class="m-top">' + badge(x.category, 'b-done') + '<span class="m-score">匹配度 ' + x.score + '%</span>' + badge(stT, 'b-confirmed') + '</div>' +
+    '<div class="detail-line">需求方：' + (demM ? anonName(demM) : '-') + '（' + (di ? esc(di.title) : '') + '）</div>' +
+    '<div class="detail-line">供给方：' + (supM ? anonName(supM) : '-') + '（' + (si ? esc(si.title) : '') + '）</div>' +
+    '<div class="detail-line">撮合时间：' + fmtTime(x.createdAt) + '</div>' +
+    (x.contract ? '<div class="contract-box"><div class="contract-title">撮合合同</div><pre class="contract-content">' + esc(x.contract.content) + '</pre></div>' : ''));
+}
+/* 工作台 / 会员改密 */
+function renderMWorkbench() {
+  var me = byId(S.memberId);
+  if (!me) return '<div class="empty"><div class="t">请先登录</div></div>';
+  var d = db();
+  var myItems = d.items.filter(function (x) { return x.memberId === me.id; });
+  var myMatches = d.matches.filter(function (x) { return x.demandMemberId === me.id || x.supplyMemberId === me.id; });
+  var confirmed = myMatches.filter(function (x) { return x.status === 'confirmed'; });
+  var myActs = d.home.activities.filter(function (a) { return (a.joined || []).indexOf(me.id) > -1; });
+  var st = function (label, n) { return '<div class="stat-cell"><div class="n">' + n + '</div><div class="t">' + label + '</div></div>'; };
+  return '<div class="card"><div class="wb-head"><div class="avatar avatar-lg ' + (me.gender === '女士' ? 'm-female' : 'm-male') + '">' + anonName(me) + '</div><div><div class="wb-name">' + esc(me.name) + '</div><div class="wb-sub">' + me.title + ' · ' + esc(me.company) + '</div></div></div>' +
+    '<div class="wb-row"><span class="k">账号</span><span class="v">' + esc(me.account) + '</span></div>' +
+    '<div class="wb-row"><span class="k">服务领域</span><span class="v">' + me.field + '</span></div>' +
+    '<div class="wb-row"><span class="k">加入时间</span><span class="v">' + fmtTime(me.createdAt) + '</span></div></div>' +
+    '<div class="section-title">数据概览</div><div class="stat-grid">' +
+    st('发布供给', myItems.filter(function (x) { return x.type === 'supply'; }).length) +
+    st('发布需求', myItems.filter(function (x) { return x.type === 'demand'; }).length) +
+    st('上架中', myItems.filter(function (x) { return x.status === 'on'; }).length) +
+    st('撮合记录', myMatches.length) + st('已确认交易', confirmed.length) + st('已报名活动', myActs.length) + '</div>';
+}
+function renderMPassword() {
+  return '<div class="card"><div class="section-title" style="margin-top:0">修改密码</div><div class="login-tip">修改密码需填写注册时的「密码提示」与「密码答案」</div>' +
+    '<div class="field"><div class="label">密码提示</div><input class="input" id="mp_hint" placeholder="注册时填写的密码提示"></div>' +
+    '<div class="field"><div class="label">密码答案</div><input class="input" id="mp_ans" placeholder="注册时填写的密码答案"></div>' +
+    '<div class="field"><div class="label">原密码</div><input class="input" type="password" id="mp_old" placeholder="请输入原密码"></div>' +
+    '<div class="field"><div class="label">新密码</div><input class="input" type="password" id="mp_n1" placeholder="6-8 位，含大小写字母与数字"></div>' +
+    '<div class="field"><div class="label">确认新密码</div><input class="input" type="password" id="mp_n2" placeholder="再次输入新密码"></div>' +
+    '<button class="btn btn-primary btn-block" onclick="mpSubmit()">确认修改</button></div>';
+}
+function mpSubmit() {
+  var v = function (id) { return document.getElementById(id).value; };
+  var r = doChangePwd('member', S.memberId, { hint: v('mp_hint').trim(), ans: v('mp_ans').trim(), old: v('mp_old'), nw: v('mp_n1'), nw2: v('mp_n2') });
+  toast(r.msg, 2600);
+}
+/* 活动详情 */
+function renderMActivity() {
+  var a = db().home.activities.find(function (x) { return x.id === S.actId; });
+  if (!a) return '<div class="empty"><div class="t">活动不存在</div></div>';
+  var joined = a.joined || [], cancelled = a.cancelled || [];
+  var myId = S.memberId;
+  var myState = cancelled.indexOf(myId) > -1 ? 'cancelled' : (joined.indexOf(myId) > -1 ? 'joined' : 'none');
+  var stTxt = myState === 'joined' ? '<span class="badge b-confirmed">已报名</span>' : (myState === 'cancelled' ? '<span class="badge b-pending">已取消报名</span>' : (joined.length >= a.quota ? '<span class="badge b-done">已满员</span>' : '<span class="badge b-new">报名中</span>'));
+  var roster = joined.map(function (mid) { var m = byId(mid); return m ? '<div class="roster-cell ' + (m.gender === '女士' ? 'm-female' : 'm-male') + '">' + esc(m.name) + '</div>' : ''; }).join('');
+  var actions = '';
+  if (myState === 'none' && joined.length < a.quota) actions = '<button class="btn btn-primary btn-block" onclick="actJoin(\'' + a.id + '\')">参加活动</button>';
+  else if (myState === 'joined') actions = '<button class="btn btn-danger btn-block" onclick="actLeave(\'' + a.id + '\')">取消报名</button>';
+  else if (myState === 'cancelled') actions = '<div class="cancelled-tip">活动报名后取消就不能再参加了</div>';
+  else actions = '<div class="cancelled-tip">活动名额已满</div>';
+  return '<div class="card"><div class="act-big-title">' + esc(a.title) + '</div>' +
+    '<div class="act-state">' + stTxt + '<span class="act-count">' + joined.length + ' / ' + a.quota + ' 人</span></div>' +
+    '<div class="act-row">时间：' + esc(a.time) + '</div><div class="act-row">地点：' + esc(a.location) + '</div>' +
+    '<div class="act-desc">' + esc(a.desc) + '</div></div>' +
+    '<div class="section-title">已报名会员（' + joined.length + '）</div><div class="roster-grid">' + roster + '</div>' +
+    (joined.length === 0 ? '<div class="empty"><div class="t">还没有会员报名</div></div>' : '') +
+    '<div class="act-actions">' + actions + '</div>';
+}
+function actJoin(id) { var r = joinActivity(id, S.memberId); toast(r.msg, 2600); render(); }
+function actLeave(id) { var r = leaveActivity(id, S.memberId); toast(r.msg, 2600); render(); }
+/* ================= 管理员端 ================= */
+function mgAdd() {
+  if (S.view === 'mg_activities') mgActEdit(null);
+  else if (S.view === 'mg_content') mgBannerEdit(null);
+}
+function renderMgContent() {
+  var d = db();
+  var cards = d.home.banners.map(function (b) {
+    return '<div class="card"><div class="b-preview"><div class="bt">' + esc(b.title) + '</div><div class="bs">' + esc(b.sub) + '</div></div>' +
+      '<div class="b-ops"><button class="btn btn-ghost btn-sm" onclick="mgBannerEdit(\'' + b.id + '\')">编辑</button><button class="btn btn-danger btn-sm" onclick="mgBannerDel(\'' + b.id + '\')">删除</button></div></div>';
+  }).join('');
+  return '<div class="section-title">广告轮播（' + d.home.banners.length + '）</div>' + cards +
+    (d.home.banners.length === 0 ? '<div class="empty"><div class="t">暂无轮播图</div></div>' : '') +
+    '<div class="section-title">商会简介</div><div class="card"><textarea class="input" id="mg_intro" style="min-height:110px">' + esc(d.home.intro) + '</textarea>' +
+    '<button class="btn btn-primary btn-block" style="margin-top:12px" onclick="mgSaveIntro()">保存简介</button></div>';
+}
+function mgSaveIntro() { var r = saveHome({ intro: document.getElementById('mg_intro').value }); toast(r.msg); }
+function mgBannerEdit(id) {
+  var d = db();
+  var b = id ? d.home.banners.find(function (x) { return x.id === id; }) : null;
+  overlay(id ? '编辑轮播' : '新增轮播',
+    '<div class="field"><div class="label">轮播标题</div><input class="input" id="mb_title" value="' + (b ? esc(b.title) : '') + '"></div>' +
+    '<div class="field"><div class="label">副标题</div><input class="input" id="mb_sub" value="' + (b ? esc(b.sub) : '') + '"></div>' +
+    '<div class="overlay-foot"><button class="btn btn-ghost" onclick="hideOverlay()">取消</button><button class="btn btn-primary" onclick="mgBannerSave(\'' + (id || '') + '\')">保存</button></div>');
+}
+function mgBannerSave(id) {
+  var v = function (x) { return document.getElementById(x).value; };
+  var title = v('mb_title').trim();
+  if (!title) { toast('请填写轮播标题'); return; }
+  var banners = db().home.banners.slice();
+  if (id) { var b = banners.find(function (x) { return x.id === id; }); if (b) { b.title = title; b.sub = v('mb_sub').trim(); } }
+  else banners.push({ id: 'b' + Date.now().toString(36), img: '', title: title, sub: v('mb_sub').trim() });
+  var r = saveHome({ banners: banners });
+  toast(r.msg); if (r.ok) { hideOverlay(); render(); }
+}
+function mgBannerDel(id) {
+  if (!confirm('确定删除该轮播图吗？')) return;
+  var r = saveHome({ banners: db().home.banners.filter(function (x) { return x.id !== id; }) });
+  toast(r.msg); render();
+}
+function renderMgActivities() {
+  var d = db();
+  var acts = d.home.activities.slice().sort(function (x, y) { return x.time < y.time ? -1 : 1; });
+  var cards = acts.map(function (a) {
+    var joined = a.joined || [];
+    return '<div class="card"><div class="act-title-row"><div class="act-title">' + esc(a.title) + '</div><span class="act-count" style="font-size:12px;color:#e08a00;font-weight:700">' + joined.length + '/' + a.quota + ' 人</span></div>' +
+      '<div class="act-line">时间：' + esc(a.time) + '</div><div class="act-line">地点：' + esc(a.location) + '</div>' +
+      '<div class="act-line">取消报名：' + (a.cancelled || []).length + ' 人</div>' +
+      '<div class="op-row"><button class="btn btn-ghost btn-sm" onclick="mgRoster(\'' + a.id + '\')">报名名单</button>' +
+      '<button class="btn btn-primary-soft btn-sm" onclick="mgActEdit(\'' + a.id + '\')">编辑</button>' +
+      '<button class="btn btn-danger btn-sm" onclick="mgActDel(\'' + a.id + '\')">删除</button></div></div>';
+  }).join('');
+  return cards + (acts.length === 0 ? '<div class="empty"><div class="t">暂无活动</div><div class="s">点击右上角「＋」新建活动邀请</div></div>' : '');
+}
+function mgActEdit(id) {
+  var d = db();
+  var a = id ? d.home.activities.find(function (x) { return x.id === id; }) : null;
+  overlay(id ? '编辑活动' : '新建活动',
+    '<div class="field"><div class="label">活动标题</div><input class="input" id="ma_title" value="' + (a ? esc(a.title) : '') + '"></div>' +
+    '<div class="field"><div class="label">活动介绍</div><textarea class="input" id="ma_desc">' + (a ? esc(a.desc) : '') + '</textarea></div>' +
+    '<div class="field"><div class="label">活动时间</div><input class="input" id="ma_time" value="' + (a ? esc(a.time) : '') + '" placeholder="如：2026-10-01 09:00"></div>' +
+    '<div class="field"><div class="label">活动地点</div><input class="input" id="ma_loc" value="' + (a ? esc(a.location) : '') + '" placeholder="如：深圳市南山区科技园"></div>' +
+    '<div class="field"><div class="label">人数上限</div><input class="input" type="number" id="ma_quota" value="' + (a ? a.quota : '') + '" placeholder="1-10000"></div>' +
+    '<div class="overlay-foot"><button class="btn btn-ghost" onclick="hideOverlay()">取消</button><button class="btn btn-primary" onclick="mgActSave(\'' + (id || '') + '\')">保存</button></div>');
+}
+function mgActSave(id) {
+  var v = function (x) { return document.getElementById(x).value; };
+  var r = saveActivity({ id: id || '', title: v('ma_title').trim(), desc: v('ma_desc').trim(), time: v('ma_time').trim(), location: v('ma_loc').trim(), quota: v('ma_quota').trim() });
+  toast(r.msg, 2600);
+  if (r.ok) { hideOverlay(); render(); }
+}
+function mgActDel(id) {
+  if (!confirm('确定删除该活动吗？删除后不可恢复。')) return;
+  delActivity(id); render();
+}
+function mgRoster(id) {
+  var a = db().home.activities.find(function (x) { return x.id === id; }); if (!a) return;
+  var rows = (a.joined || []).map(function (mid) {
+    var m = byId(mid);
+    return m ? '<div class="rs-row"><div class="avatar avatar-sm ' + (m.gender === '女士' ? 'm-female' : 'm-male') + '">' + anonName(m) + '</div><div class="rs-name">' + esc(m.name) + '</div><div class="rs-phone">' + m.phone + '</div></div>' : '';
+  }).join('');
+  overlay('报名名单', '<div class="section-title" style="margin-top:0">' + esc(a.title) + '（' + (a.joined || []).length + ' 人）</div>' + rows +
+    ((a.joined || []).length === 0 ? '<div class="empty"><div class="t">暂无会员报名</div></div>' : ''));
+}
+function renderMgPassword() {
+  return '<div class="card"><div class="section-title" style="margin-top:0">修改密码</div><div class="login-tip">管理员修改密码需输入授权号</div>' +
+    '<div class="field"><div class="label">授权号</div><input class="input" type="password" id="gp_auth" placeholder="请输入授权号"></div>' +
+    '<div class="field"><div class="label">原密码</div><input class="input" type="password" id="gp_old" placeholder="请输入原密码"></div>' +
+    '<div class="field"><div class="label">新密码</div><input class="input" type="password" id="gp_n1" placeholder="6-8 位，含大小写字母与数字"></div>' +
+    '<div class="field"><div class="label">确认新密码</div><input class="input" type="password" id="gp_n2" placeholder="再次输入新密码"></div>' +
+    '<button class="btn btn-primary btn-block" onclick="gpSubmit()">确认修改</button></div>';
+}
+function gpSubmit() {
+  var v = function (x) { return document.getElementById(x).value; };
+  var r = doChangePwd('manager', null, { auth: v('gp_auth').trim(), old: v('gp_old'), nw: v('gp_n1'), nw2: v('gp_n2') });
+  toast(r.msg, 2600);
+}
+/* ================= 初始化 ================= */
+document.body.insertAdjacentHTML('beforeend', '<div class="overlay-mask" id="overlay"></div>');
+runMatching();
+var sess = getSession();
+if (sess && sess.role) { S.role = sess.role; S.memberId = sess.memberId || ''; }
+var hv = location.hash.replace('#', '') || 'login';
+S.view = (sess && sess.role) ? hv : 'login';
+render();
+</script>
+
